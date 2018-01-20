@@ -59,6 +59,8 @@ def get_post_info(post,user_list):
     post_dict['permalink'] = post.permalink
     if post.author:
         post_dict['author'] = post.author.name
+        with open(user_list,'a') as f:
+            f.write(post.author.name+', ')
     post_dict['selftext'] = post.selftext
     post_dict['domain'] = post.domain
     post_dict['link_url'] = post.url
@@ -102,7 +104,7 @@ def get_10_children(comment,user_list):
             i+=1
             if i==10: break
             if reply.author:
-                users.append(reply.author)
+                users.append(reply.author.name)
             comments.append(reply.body)
     return (users,comments)
 
@@ -112,7 +114,7 @@ def get_write_sub_data(sub_name,date,reddit,user_list):
         sub = reddit.subreddit(sub_name)
     except:
         print('trying to get subbreddit broke',sub_name)
-        with open('~/data'+date+'/'+'failed_subs'+date+'.txt','a') as f:
+        with open('../data'+date+'/'+'failed_subs'+date+'.txt','a') as f:
             f.write(sub_name+', ')
         return None
 
