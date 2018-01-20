@@ -99,7 +99,9 @@ def get_10_children(comment,user_list):
     comments = []
     i = 0
     if comment.replies:
-        comment.replies.replace_more()
+        try:
+            comment.replies.replace_more()
+
         for reply in comment.replies:
             i+=1
             if i==10: break
@@ -160,13 +162,11 @@ date = "_"+str(n.month)+"_"+str(n.day)
 directory = '../data'+date+'/'
 if not os.path.exists(directory):
     os.makedirs(directory)
-user_list = directory+'users_list'+date+'.csv'
-open(user_list,'w').close()
-open(directory+'failed_subs'+date+'.txt','w').close()
+open(directory+'failed_subs'+date+'.txt','w+').close()
 for i in range(1,5):
     keys = np.loadtxt('keys/reddit{}.txt'.format(i),dtype=str,delimiter=',')
     user_list = directory+'users_list'+date+str(i)+'.txt'
-    open(user_list,'w').close()
+    open(user_list,'w+').close()
 
     p = Process(target=do_list_of_subs, args = (lists[i-1],keys,date,user_list))
     processes.append(p)
