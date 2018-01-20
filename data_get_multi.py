@@ -165,6 +165,9 @@ open(user_list,'w').close()
 open(directory+'failed_subs'+date+'.txt','w').close()
 for i in range(1,5):
     keys = np.loadtxt('keys/reddit{}.txt'.format(i),dtype=str,delimiter=',')
+    user_list = directory+'users_list'+date+str(i)+'.txt'
+    open(user_list,'w').close()
+
     p = Process(target=do_list_of_subs, args = (lists[i-1],keys,date,user_list))
     processes.append(p)
 for p in processes:
