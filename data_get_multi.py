@@ -159,7 +159,7 @@ if not os.path.exists(directory):
     os.makedirs(directory)
 user_list = directory+'users_list'+date+'.csv'
 open(user_list,'w').close()
-open(directory/'failed_subs'+date+'.txt','w').close()
+open(directory+'failed_subs'+date+'.txt','w').close()
 for i in range(1,5):
     keys = np.loadtxt('keys/reddit{}.txt'.format(i),dtype=str,delimiter=',')
     p = Process(target=do_list_of_subs, args = (lists[i-1],keys,date,user_list))
