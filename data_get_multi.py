@@ -101,7 +101,8 @@ def get_10_children(comment,user_list):
     if comment.replies:
         try:
             comment.replies.replace_more()
-
+        except:
+            print('comment replace more failed')
         for reply in comment.replies:
             i+=1
             if i==10: break
