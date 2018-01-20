@@ -141,7 +141,7 @@ def get_write_sub_data(sub_name,date,reddit):
         print('trying to loop through posts broke',sub_name)
         return None
 
-    filename = '~/data'+date+'/'+sub_name+date+'.json'
+    filename = '../data'+date+'/'+sub_name+date+'.json'
     print('writing ',sub_name," as ", filename)
 
     with open(filename,'w') as f:
@@ -154,7 +154,7 @@ lists = [sublist[:n],sublist[n:2*n],sublist[2*n:3*n],sublist[4*n:]]
 processes = []
 n = datetime.datetime.now()
 date = "_"+str(n.month)+"_"+str(n.day)
-directory = '~/data'+date+'/'
+directory = '../data'+date+'/'
 if not os.path.exists(directory):
     os.makedirs(directory)
 user_list = directory+'users_list'+date+'.csv'
