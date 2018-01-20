@@ -60,7 +60,9 @@ def get_post_info(post,user_list):
     if post.author:
         post_dict['author'] = post.author.name
         with open(user_list,'a') as f:
-            f.write(post.author.name+', ')
+            f.write(post.author.name)
+            f.write(', ')
+
     post_dict['selftext'] = post.selftext
     post_dict['domain'] = post.domain
     post_dict['link_url'] = post.url
@@ -71,22 +73,33 @@ def get_post_info(post,user_list):
         try:
             post.comments.replace_more()
         except:
-            print('failed comments.replace_more')
+            print('failed comments replace_more')
             continue
+        try:
+            for comment in post.comments:
+                comment_list.append(comment.body)
+                if comment.author:
+                    try:
+                        with open(user_list,'a+',encoding="utf-8") as f:
+                            f.write(comment.author.name)
+                    except:
+                        print('trying to write users broke')
 
-        for comment in post.comments:
-            comment_list.append(comment.body)
-            if comment.author:
-                with open(user_list,'a') as f:
-                    f.write(comment.author.name+', ')
-            if comment.replies:
-                users,replies = get_10_children(comment)
-                comment_list+=replies
-                if users:
-                    with open(user_list,'a') as f:
-                        for user in users:
-                            f.write(user+', ')
-            if len(comment_list) >= 1000: break
+                if comment.replies:
+                    users,replies = get_10_children(comment)
+                    comment_list+=replies
+                    if users:
+                        string = ", ".join(users)
+                        try:
+                            with open(user_list,'a+',encoding="utf-8") as f:
+                                    f.write(string)
+                                    f.write(', ')
+                        except:
+                            print('trying to write users broke')
+                if len(comment_list) >= 1000: break
+        except:
+            print('trying to get comments broke')
+            break
     post_dict['comments'] = comment_list
     return post_dict
 
@@ -156,7 +169,8 @@ def get_write_sub_data(sub_name,date,reddit,user_list):
 
 sublist = get_subreddits()
 n = len(sublist)//4
-lists = [sublist[:n],sublist[n:2*n],sublist[2*n:3*n],sublist[4*n:]]
+print('attempting to get',len(sublist), 'subreddits')
+lists = [sublist[:n],sublist[n:2*n],sublist[2*n:3*n],sublist[3*n:]]
 processes = []
 n = datetime.datetime.now()
 date = "_"+str(n.month)+"_"+str(n.day)
