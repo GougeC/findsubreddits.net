@@ -77,7 +77,8 @@ def get_post_info(post,user_list):
             continue
         try:
             for comment in post.comments:
-                comment_list.append(comment.body)
+                if comment.body:
+                    comment_list.append(comment.body)
                 if comment.author:
                     try:
                         with open(user_list,'a+',encoding="utf-8") as f:
@@ -88,14 +89,17 @@ def get_post_info(post,user_list):
                 if comment.replies:
                     users,replies = get_10_children(comment)
                     comment_list+=replies
-                    if users:
-                        string = ", ".join(users)
-                        try:
-                            with open(user_list,'a+',encoding="utf-8") as f:
-                                    f.write(string)
-                                    f.write(', ')
-                        except:
-                            print('trying to write users broke')
+                    try:
+                        if users:
+                            string = ", ".join(users)
+                            try:
+                                with open(user_list,'a+',encoding="utf-8") as f:
+                                        f.write(string)
+                                        f.write(', ')
+                            except:
+                                print('trying to write users broke')
+                    except:
+                        print('problem with if users')
                 if len(comment_list) >= 1000: break
         except:
             print('trying to get comments broke')
