@@ -105,7 +105,7 @@ def get_10_children(comment,user_list):
             comments.append(reply.body)
     return (users,comments)
 
-def get_write_sub_data(sub_name,date,reddit):
+def get_write_sub_data(sub_name,date,reddit,user_list):
     print(sub_name)
     try:
         sub = reddit.subreddit(sub_name)
@@ -132,7 +132,7 @@ def get_write_sub_data(sub_name,date,reddit):
                 #print('getting post number ', i," from r/",sub_name)
                 #t1 = time.time()
             try:
-                posts[post.id] = get_post_info(post)
+                posts[post.id] = get_post_info(post,user_list)
             except:
                 print('trying get_post_info broke',sub_name,i)
                 continue
