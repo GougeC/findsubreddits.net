@@ -111,7 +111,7 @@ def get_write_sub_data(sub_name,date,reddit):
         sub = reddit.subreddit(sub_name)
     except:
         print('trying to get subbreddit broke',sub_name)
-        with open('failed_subs'+date+'.txt','a') as f:
+        with open('~/data'+date+'/'+'failed_subs'+date+'.txt','a') as f:
             f.write(sub_name+', ')
         return None
 
@@ -141,7 +141,7 @@ def get_write_sub_data(sub_name,date,reddit):
         print('trying to loop through posts broke',sub_name)
         return None
 
-    filename = 'data'+date+'/'+sub_name+date+'.json'
+    filename = '~/data'+date+'/'+sub_name+date+'.json'
     print('writing ',sub_name," as ", filename)
 
     with open(filename,'w') as f:
@@ -154,12 +154,12 @@ lists = [sublist[:n],sublist[n:2*n],sublist[2*n:3*n],sublist[4*n:]]
 processes = []
 n = datetime.datetime.now()
 date = "_"+str(n.month)+"_"+str(n.day)
-directory = 'data'+date+'/'
+directory = '~/data'+date+'/'
 if not os.path.exists(directory):
     os.makedirs(directory)
 user_list = directory+'users_list'+date+'.csv'
 open(user_list,'w').close()
-open('failed_subs'+date+'.txt','w').close()
+open(directory/'failed_subs'+date+'.txt','w').close()
 for i in range(1,5):
     keys = np.loadtxt('keys/reddit{}.txt'.format(i),dtype=str,delimiter=',')
     p = Process(target=do_list_of_subs, args = (lists[i-1],keys,date,user_list))
