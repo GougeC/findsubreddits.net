@@ -61,7 +61,7 @@ def get_post_info(post,user_list):
         post_dict['author'] = post.author.name
         with open(user_list,'a') as f:
             f.write(post.author.name)
-            f.write(', ')
+            f.write(',')
 
     post_dict['selftext'] = post.selftext
     post_dict['domain'] = post.domain
@@ -82,24 +82,24 @@ def get_post_info(post,user_list):
                 if comment.author:
                     try:
                         with open(user_list,'a+',encoding="utf-8") as f:
-                            f.write(comment.author.name)
+                            f.write(comment.author.name+',')
                     except:
                         print('trying to write users broke')
 
                 if comment.replies:
                     users,replies = get_10_children(comment)
                     comment_list+=replies
-                    try:
-                        if users:
-                            string = ", ".join(users)
-                            try:
-                                with open(user_list,'a+',encoding="utf-8") as f:
-                                        f.write(string)
-                                        f.write(', ')
-                            except:
-                                print('trying to write users broke')
-                    except:
-                        print('problem with if users')
+                #    try:
+                #        if users:
+                #            string = ", ".join(users)
+                #            try:
+            #                    with open(user_list,'a+',encoding="utf-8") as f:
+        #                                f.write(string)
+    #                                    f.write(', ')
+    #                        except:
+    #                            print('trying to write users broke')
+    #                except:
+    #                    print('problem with if users')
                 if len(comment_list) >= 1000: break
         except:
             print('trying to get comments broke')
@@ -124,6 +124,9 @@ def get_10_children(comment,user_list):
             i+=1
             if i==10: break
             if reply.author:
+                with open(user_list,'a+') as f:
+                    f.write(reply.author.name)
+                    f.write(',')
                 users.append(reply.author.name)
             comments.append(reply.body)
     return (users,comments)
