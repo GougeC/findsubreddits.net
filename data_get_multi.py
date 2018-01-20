@@ -70,12 +70,13 @@ def get_post_info(post,user_list):
             post.comments.replace_more()
         except:
             print('failed comments.replace_more')
+            continue
 
         for comment in post.comments:
             comment_list.append(comment.body)
             if comment.author:
                 with open(user_list,'a') as f:
-                    f.write(comment.author+', ')
+                    f.write(comment.author.name+', ')
             if comment.replies:
                 users,replies = get_10_children(comment)
                 comment_list+=replies
