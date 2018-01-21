@@ -61,7 +61,7 @@ def get_post_info(post,user_list):
         post_dict['author'] = post.author.name
         with open(user_list,'a') as f:
             f.write(post.author.name)
-            f.write(',')
+            f.write(',\n')
 
     post_dict['selftext'] = post.selftext
     post_dict['domain'] = post.domain
@@ -80,16 +80,12 @@ def get_post_info(post,user_list):
                 if comment.body:
                     comment_list.append(comment.body)
                 if comment.author:
-                    try:
-                        with open(user_list,'a+') as f:
-                            f.write(comment.author.name+',')
-                    except:
-                        print('trying to write users broke')
+                    with open(user_list,'a+') as g:
+                        g.write(comment.author.name+',\n')
 
                 if comment.replies:
-                    replies = get_10_children(comment,user_list)
-                    print('success getting replies')
-                    comment_list+=replies
+                    reps = get_10_children(comment,user_list)
+                    comment_list+=reps
                 #    try:
                 #        if users:
                 #            string = ", ".join(users)
@@ -124,9 +120,9 @@ def get_10_children(comment,user_list):
             i+=1
             if i==10: break
             if reply.author.name:
-                with open(user_list,'a+') as f:
-                    f.write(reply.author.name)
-                    f.write(',')
+                with open(user_list,'a+') as h:
+                    h.write(reply.author.name)
+                    h.write(',\n')
             if reply.body:
                 comments.append(reply.body)
     return comments
@@ -197,3 +193,5 @@ for p in processes:
     p.start()
 for p in processes:
     p.join()
+
+print('Processes Finished')
