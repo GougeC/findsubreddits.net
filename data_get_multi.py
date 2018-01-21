@@ -87,7 +87,7 @@ def get_post_info(post,user_list):
                         print('trying to write users broke')
 
                 if comment.replies:
-                    users,replies = get_10_children(comment,user_list)
+                    replies = get_10_children(comment,user_list)
                     comment_list+=replies
                 #    try:
                 #        if users:
@@ -124,13 +124,12 @@ def get_10_children(comment,user_list):
             i+=1
             if i==10: break
             if reply.author.name:
-
                 with open(user_list,'a+') as f:
                     f.write(reply.author.name)
                     f.write(',')
                 users.append(reply.author.name)
             comments.append(reply.body)
-    return (users,comments)
+    return comments
 
 def get_write_sub_data(sub_name,date,reddit,user_list):
     print(sub_name)
