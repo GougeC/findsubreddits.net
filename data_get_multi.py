@@ -59,11 +59,9 @@ def get_post_info(post,user_list):
     post_dict['permalink'] = post.permalink
     if post.author.name:
         post_dict['author'] = post.author.name
-        print('trying to get author')
         with open(user_list,'a') as f:
             f.write(post.author.name)
             f.write(',')
-        print('successfuly wrote autho')
 
     post_dict['selftext'] = post.selftext
     post_dict['domain'] = post.domain
@@ -80,7 +78,6 @@ def get_post_info(post,user_list):
         try:
             for comment in post.comments:
                 if comment.body:
-                    print('appending body')
                     comment_list.append(comment.body)
                 if comment.author:
                     try:
