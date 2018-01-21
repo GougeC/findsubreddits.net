@@ -90,7 +90,7 @@ def get_post_info(post,user_list):
                         print('trying to write users broke')
 
                 if comment.replies:
-                    users,replies = get_10_children(comment)
+                    users,replies = get_10_children(comment,user_list)
                     comment_list+=replies
                 #    try:
                 #        if users:
@@ -126,7 +126,8 @@ def get_10_children(comment,user_list):
         for reply in comment.replies:
             i+=1
             if i==10: break
-            if reply.author:
+            if reply.author.name:
+
                 with open(user_list,'a+') as f:
                     f.write(reply.author.name)
                     f.write(',')
