@@ -88,6 +88,7 @@ def get_post_info(post,user_list):
 
                 if comment.replies:
                     replies = get_10_children(comment,user_list)
+                    print('success getting replies')
                     comment_list+=replies
                 #    try:
                 #        if users:
@@ -129,7 +130,8 @@ def get_10_children(comment,user_list):
             if reply.body:
                 comments.append(reply.body)
     return comments
-S
+
+
 def get_write_sub_data(sub_name,date,reddit,user_list):
     print(sub_name)
     try:
