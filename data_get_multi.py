@@ -81,7 +81,7 @@ def get_post_info(post,user_list):
                     comment_list.append(comment.body)
                 if comment.author:
                     try:
-                        with open(user_list,'a+',encoding="utf-8") as f:
+                        with open(user_list,'a+') as f:
                             f.write(comment.author.name+',')
                     except:
                         print('trying to write users broke')
@@ -112,7 +112,6 @@ def get_10_children(comment,user_list):
     given a reddit comment object in PRAW this returns the text and users
     from 10 children comments
     '''
-    users = []
     comments = []
     i = 0
     if comment.replies:
@@ -127,10 +126,10 @@ def get_10_children(comment,user_list):
                 with open(user_list,'a+') as f:
                     f.write(reply.author.name)
                     f.write(',')
-                users.append(reply.author.name)
-            comments.append(reply.body)
+            if reply.body:
+                comments.append(reply.body)
     return comments
-
+S
 def get_write_sub_data(sub_name,date,reddit,user_list):
     print(sub_name)
     try:
