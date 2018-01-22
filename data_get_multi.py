@@ -9,7 +9,7 @@ import os
 import datetime
 import requests
 from bs4 import BeautifulSoup
-
+import get_reddit_user_data as grud
 
 
 def do_list_of_subs(subreddit_list,keys,date,user_list):
@@ -82,21 +82,13 @@ def get_post_info(post,user_list):
                 if comment.author:
                     with open(user_list,'a+') as g:
                         g.write(comment.author.name+',\n')
+                try:
+                    if comment.replies:
+                        reps = get_10_children(comment,user_list)
+                        comment_list+=reps
+                except:
+                    print('trying to get children broke')
 
-                if comment.replies:
-                    reps = get_10_children(comment,user_list)
-                    comment_list+=reps
-                #    try:
-                #        if users:
-                #            string = ", ".join(users)
-                #            try:
-            #                    with open(user_list,'a+',encoding="utf-8") as f:
-        #                                f.write(string)
-    #                                    f.write(', ')
-    #                        except:
-    #                            print('trying to write users broke')
-    #                except:
-    #                    print('problem with if users')
                 if len(comment_list) >= 1000: break
         except:
             print('trying to get comments broke')
@@ -116,6 +108,7 @@ def get_10_children(comment,user_list):
             comment.replies.replace_more()
         except:
             print('comment replace more failed')
+        i = 0
         for reply in comment.replies:
             i+=1
             if i==10: break
@@ -129,6 +122,11 @@ def get_10_children(comment,user_list):
 
 
 def get_write_sub_data(sub_name,date,reddit,user_list):
+    '''
+    Retrives the data from the sub named in the sub_name parameter
+    and writes the data as a json with the date included in the filename
+    '''
+
     print(sub_name)
     try:
         sub = reddit.subreddit(sub_name)
@@ -140,20 +138,11 @@ def get_write_sub_data(sub_name,date,reddit,user_list):
 
 
     posts = {}
-    top = sub.top(time_filter = 'week')
+    top = sub.top(time_filter = 'month')
     i = 0
     try:
         for post in top:
             i+=1
-            #totalposts+=1
-            #if i%10 == 0:
-                #t2 = time.time()
-                #elapsed = t2 - t1
-                #totaltime+= elapsed
-                #print(elapsed, 'seconds taken for last 10')
-                #print(totaltime/totalposts,' seconds per post on average')
-                #print('getting post number ', i," from r/",sub_name)
-                #t1 = time.time()
             try:
                 posts[post.id] = get_post_info(post,user_list)
             except:
@@ -186,12 +175,38 @@ for i in range(1,5):
     keys = np.loadtxt('keys/reddit{}.txt'.format(i),dtype=str,delimiter=',')
     user_list = directory+'users_list'+date+str(i)+'.txt'
     open(user_list,'w+').close()
-
     p = Process(target=do_list_of_subs, args = (lists[i-1],keys,date,user_list))
     processes.append(p)
+
 for p in processes:
     p.start()
 for p in processes:
     p.join()
+print('Processes Finished for subreddit data')
 
-print('Processes Finished')
+users1 = pd.read_csv(directory+'users_list'+date+str(1)+'.txt',header=None)[0]
+users2 = pd.read_csv(directory+'users_list'+date+str(2)+'.txt',header=None)[0]
+users3 = pd.read_csv(directory+'users_list'+date+str(3)+'.txt',header=None)[0]
+users4 = pd.read_csv(directory+'users_list'+date+str(3)+'.txt',header=None)[0]
+
+bagousers = set()
+user
+for lst in [users1,users2,users3,users4]:
+    uniq = lst.unique()
+    for user in uniq:
+        bagousers.add(user)
+users_unique = list(bagousers)
+k = len(users_unique_list)//4
+lists = [users_unique[:k],users_unique[k:2*k],users_unique[2*k,3*k],users_unique[3*k:]]
+
+for i in range(1,5):
+    keys = np.loadtxt('keys/reddit{}.txt'.format(i),dtype=str,delimiter=',')
+    filename = '../data'+date+'/'+'USER_DATA_'+str(i)+'.json'
+    p = Process(target=grud.get_data_for_userlist, args = (lists[i-1],keys,filename))
+    processes.append(p)
+
+for p in processes:
+    p.start()
+for p in processes:
+    p.join()
+print('Processes Finished for subreddit data')
