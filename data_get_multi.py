@@ -184,33 +184,37 @@ for i in range(1,5):
 
 for p in processes:
     p.start()
+counter = 0
 for p in processes:
     p.join()
+    counter+=1
+
 print('Processes Finished for subreddit data')
 
-users1 = pd.read_csv(directory+'users_list'+date+str(1)+'.txt',header=None)[0]
-users2 = pd.read_csv(directory+'users_list'+date+str(2)+'.txt',header=None)[0]
-users3 = pd.read_csv(directory+'users_list'+date+str(3)+'.txt',header=None)[0]
-users4 = pd.read_csv(directory+'users_list'+date+str(3)+'.txt',header=None)[0]
+if counter==4:
+    users1 = pd.read_csv(directory+'users_list'+date+str(1)+'.txt',header=None)[0]
+    users2 = pd.read_csv(directory+'users_list'+date+str(2)+'.txt',header=None)[0]
+    users3 = pd.read_csv(directory+'users_list'+date+str(3)+'.txt',header=None)[0]
+    users4 = pd.read_csv(directory+'users_list'+date+str(3)+'.txt',header=None)[0]
 
-bagousers = set()
-user
-for lst in [users1,users2,users3,users4]:
-    uniq = lst.unique()
-    for user in uniq:
-        bagousers.add(user)
-users_unique = list(bagousers)
-k = len(users_unique_list)//4
-lists = [users_unique[:k],users_unique[k:2*k],users_unique[2*k,3*k],users_unique[3*k:]]
+    bagousers = set()
+    user
+    for lst in [users1,users2,users3,users4]:
+        uniq = lst.unique()
+        for user in uniq:
+            bagousers.add(user)
+    users_unique = list(bagousers)
+    k = len(users_unique_list)//4
+    lists = [users_unique[:k],users_unique[k:2*k],users_unique[2*k,3*k],users_unique[3*k:]]
 
-for i in range(1,5):
-    keys = np.loadtxt('keys/reddit{}.txt'.format(i),dtype=str,delimiter=',')
-    filename = '../data'+date+'/'+'USER_DATA_'+str(i)+'.json'
-    p = Process(target=grud.get_data_for_userlist, args = (lists[i-1],keys,filename,client))
-    processes.append(p)
+    for i in range(1,5):
+        keys = np.loadtxt('keys/reddit{}.txt'.format(i),dtype=str,delimiter=',')
+        filename = '../data'+date+'/'+'USER_DATA_'+str(i)+'.json'
+        p = Process(target=grud.get_data_for_userlist, args = (lists[i-1],keys,filename,client))
+        processes.append(p)
 
-for p in processes:
-    p.start()
-for p in processes:
-    p.join()
-print('Processes Finished for subreddit data')
+    for p in processes:
+        p.start()
+    for p in processes:
+        p.join()
+    print('Processes Finished for subreddit data')

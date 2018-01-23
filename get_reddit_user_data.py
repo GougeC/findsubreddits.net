@@ -19,7 +19,7 @@ def get_data_for_userlist(user_list,keys,filename,client):
                      client_id = keys[0] ,
                      user_agent = 'datagathering by /u/GougeC')
 
-    users = []]
+    users = []
     count = 0
     for user in user_list:
         count+=1
@@ -41,5 +41,5 @@ def get_data_for_userlist(user_list,keys,filename,client):
 
     db = client.capstone_db
     usertable = db.users
-    for user in users
+    for user in users:
         usertable.insert(user)
