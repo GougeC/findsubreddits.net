@@ -195,6 +195,7 @@ for i in range(1,5):
     keys = np.loadtxt('keys/reddit{}.txt'.format(i),dtype=str,delimiter=',')
     user_list = directory+'users_list'+date+str(i)+'.txt'
     open(user_list,'w+').close()
+    client = pymongo.MongoClient('mongodb://ec2-54-214-228-72.us-west-2.compute.amazonaws.com:27017/')
     p = Process(target=do_list_of_subs, args = (lists[i-1],keys,date,user_list,client))
     processes.append(p)
 
