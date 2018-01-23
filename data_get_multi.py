@@ -10,9 +10,11 @@ import datetime
 import requests
 from bs4 import BeautifulSoup
 import get_reddit_user_data as grud
+import pymongo
 
 
-def do_list_of_subs(subreddit_list,keys,date,user_list):
+
+def do_list_of_subs(subreddit_list,keys,date,user_list,client):
     '''
     This is the task for each process to complete when multiprocessing data scraping
     from reddit api
@@ -47,7 +49,7 @@ def get_subreddits():
             subs.remove(x)
     return subs
 
-def get_post_info(post,user_list):
+def get_post_info(post,user_list,client):
     '''
     Input: a PRAW post object
     Output: a post dictionary with data about the post imputed
@@ -121,7 +123,7 @@ def get_10_children(comment,user_list):
     return comments
 
 
-def get_write_sub_data(sub_name,date,reddit,user_list):
+def get_write_sub_data(sub_name,date,reddit,user_list,client):
     '''
     Retrives the data from the sub named in the sub_name parameter
     and writes the data as a json with the date included in the filename
@@ -155,11 +157,13 @@ def get_write_sub_data(sub_name,date,reddit,user_list):
 
     filename = '../data'+date+'/'+sub_name+date+'.json'
     print('writing ',sub_name," as ", filename)
+    subreddit_data = {'subreddit':sub_name,'posts':posts}
+    db = client.capstone_db
+    subs = db.subreddits
+    subs.insert(subreddit_data)
 
-    with open(filename,'w') as f:
-        json.dump(posts,f)
 
-
+client = pymongo.MongoClient('mongodb://ec2-34-211-151-30.us-west-2.compute.amazonaws.com:27017/')
 sublist = get_subreddits()
 n = len(sublist)//4
 print('attempting to get',len(sublist), 'subreddits')
@@ -175,7 +179,7 @@ for i in range(1,5):
     keys = np.loadtxt('keys/reddit{}.txt'.format(i),dtype=str,delimiter=',')
     user_list = directory+'users_list'+date+str(i)+'.txt'
     open(user_list,'w+').close()
-    p = Process(target=do_list_of_subs, args = (lists[i-1],keys,date,user_list))
+    p = Process(target=do_list_of_subs, args = (lists[i-1],keys,date,user_list,client))
     processes.append(p)
 
 for p in processes:
@@ -202,7 +206,7 @@ lists = [users_unique[:k],users_unique[k:2*k],users_unique[2*k,3*k],users_unique
 for i in range(1,5):
     keys = np.loadtxt('keys/reddit{}.txt'.format(i),dtype=str,delimiter=',')
     filename = '../data'+date+'/'+'USER_DATA_'+str(i)+'.json'
-    p = Process(target=grud.get_data_for_userlist, args = (lists[i-1],keys,filename))
+    p = Process(target=grud.get_data_for_userlist, args = (lists[i-1],keys,filename,client))
     processes.append(p)
 
 for p in processes:

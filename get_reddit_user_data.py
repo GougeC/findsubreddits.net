@@ -2,8 +2,10 @@ import pandas as pd
 import numpy as np
 import praw
 import json
+import pymongo
 
-def get_data_for_userlist(user_list,keys,filename):
+
+def get_data_for_userlist(user_list,keys,filename,client):
     '''
     Takes in a list of unique reddit users, and reddit api keys then
     gets a list of their last 20 comments and the subreddits they commented
@@ -17,7 +19,7 @@ def get_data_for_userlist(user_list,keys,filename):
                      client_id = keys[0] ,
                      user_agent = 'datagathering by /u/GougeC')
 
-    users = {}
+    users = []]
     count = 0
     for user in user_list:
         count+=1
@@ -35,6 +37,9 @@ def get_data_for_userlist(user_list,keys,filename):
             i+=1
             user_dict['subreddits'].append(comment.subreddit)
             user_dict['comments'].append(comment.body)
-        users[user] = user_dict
-    with open(filename,'w') as f:
-        json.dump(users,f)
+        users.append(user_dict)
+
+    db = client.capstone_db
+    usertable = db.users
+    for user in users
+        usertable.insert(user)
