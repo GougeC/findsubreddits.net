@@ -169,8 +169,8 @@ def get_write_sub_data(sub_name,date,reddit,user_list,client):
                     posts.insert_one(post_dic)
                 except Exception as e:
                     print("failed to add post to db ",sub_name, e)
-            except:
-                print('trying get_post_info broke',sub_name)
+            except Exception as e:
+                print('trying get_post_info broke',sub_name, e)
                 continue
 
     except:

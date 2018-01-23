@@ -10,11 +10,12 @@ from nltk import word_tokenize
 from nltk.stem.porter import PorterStemmer
 from nltk.corpus import stopwords
 
-def get_sub_term_freq(subreddit):
+def get_sub_term_freq(subreddit,db):
     '''
     Returns a counter of all the terms in a given subreddit's comments.
     Everything is lowercased and punctuation is removed
     returns a Counter object
+    takes in a string sub name and a database to pull info from
     '''
     #assigning stopwords from nltk.stopwords
     stopWords = set(stopwords.words('english'))
@@ -33,6 +34,7 @@ def get_sub_term_freq(subreddit):
                     sub_counter[word]+=1
     return sub_counter
 
+
 def get_tf_idf_subreddits(db):
     '''
     This returns tf-idf vectors for each subreddit, treating all of
@@ -47,7 +49,7 @@ def get_tf_idf_subreddits(db):
     total_freqs = Counter()
 
     for sub in all_subs:
-        cntr = get_sub_term_freq(sub)
+        cntr = get_sub_term_freq(sub,db)
         total_freqs+=cntr
         sub_counters[sub] = cntr
 
@@ -103,8 +105,8 @@ def get_tf_idf_subreddits(db):
     return_info = {'tfidf_matrix':tf_idf_matrix,
                    'subreddit_lookup_d':sublookup,
                    'word_to_index_d': word_lookup,
-                   'index_to_word_d':index_lookup
-                   'raw_count_matrix':raw_count_matrix
-                   'subreddit_to_vec'
+                   'index_to_word_d':index_lookup,
+                   'raw_count_matrix':raw_count_matrix,
+                   'subreddit_to_vec':subreddit_vectors}
 
     return return_info
