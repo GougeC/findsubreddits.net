@@ -24,7 +24,7 @@ def do_list_of_subs(subreddit_list,keys,date,user_list,client):
                          user_agent = 'datagathering by /u/GougeC')
 
     for sub_name in subreddit_list:
-        get_write_sub_data(sub_name,date,reddit,user_list)
+        get_write_sub_data(sub_name,date,reddit,user_list,client)
 
 def get_subreddits():
     '''
@@ -149,7 +149,7 @@ def get_write_sub_data(sub_name,date,reddit,user_list,client):
         for post in top:
             i+=1
             try:
-                posts[post.id] = get_post_info(post,user_list)
+                posts[post.id] = get_post_info(post,user_list,client)
             except:
                 print('trying get_post_info broke',sub_name,i)
                 continue
@@ -199,7 +199,7 @@ if counter==4:
     users1 = pd.read_csv(directory+'users_list'+date+str(1)+'.txt',header=None)[0]
     users2 = pd.read_csv(directory+'users_list'+date+str(2)+'.txt',header=None)[0]
     users3 = pd.read_csv(directory+'users_list'+date+str(3)+'.txt',header=None)[0]
-    users4 = pd.read_csv(directory+'users_list'+date+str(3)+'.txt',header=None)[0]
+    users4 = pd.read_csv(directory+'users_list'+date+str(4)+'.txt',header=None)[0]
 
     bagousers = set()
     user
