@@ -64,6 +64,7 @@ def get_post_info(post,user_list,client):
         with open(user_list,'a') as f:
             f.write(post.author.name)
             f.write(',\n')
+            f.flush()
 
     post_dict['selftext'] = post.selftext
     post_dict['domain'] = post.domain
@@ -84,12 +85,13 @@ def get_post_info(post,user_list,client):
                 if comment.author:
                     with open(user_list,'a+') as g:
                         g.write(comment.author.name+',\n')
+                        g.flush()
                 try:
                     if comment.replies:
                         reps = get_10_children(comment,user_list)
                         comment_list+=reps
-                except:
-                    print('trying to get children broke')
+                except Exception as e:
+                    print('trying to get children broke',str(e))
 
                 if len(comment_list) >= 1000: break
         except:
@@ -118,6 +120,7 @@ def get_10_children(comment,user_list):
                 with open(user_list,'a+') as h:
                     h.write(reply.author.name)
                     h.write(',\n')
+                    h.flush()
             if reply.body:
                 comments.append(reply.body)
     return comments
@@ -191,7 +194,7 @@ for p in processes:
 
 print('Processes Finished for subreddit data')
 for i in range(4):
-    open(directory+'users_list'+date+str(i)+'.txt',header=None,'w').close()
+    open(directory+'users_list'+date+str(i)+'.txt','w').close()
 if counter==4:
     users1 = pd.read_csv(directory+'users_list'+date+str(1)+'.txt',header=None)[0]
     users2 = pd.read_csv(directory+'users_list'+date+str(2)+'.txt',header=None)[0]
