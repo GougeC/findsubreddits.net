@@ -179,7 +179,7 @@ def get_write_sub_data(sub_name,date,reddit,user_list,client):
     print("finished sub: {}. It took {} seconds.".format(sub_name,elapsed))
 
 
-client = pymongo.MongoClient('mongodb://ec2-34-211-151-30.us-west-2.compute.amazonaws.com:27017/')
+client = pymongo.MongoClient('mongodb://ec2-54-214-228-72.us-west-2.compute.amazonaws.com:27017/')
 sublist = get_subreddits()
 n = len(sublist)//4
 print('attempting to get',len(sublist), 'subreddits')
