@@ -119,7 +119,7 @@ def get_10_children(comment,user_list):
             if i==10: break
             if reply.author:
                 with open(user_list,'a+') as h:
-                    h.write(reply.author)
+                    h.write(reply.author.name)
                     h.write(',\n')
                     h.flush()
             if reply.body:
