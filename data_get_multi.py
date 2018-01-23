@@ -14,7 +14,7 @@ import pymongo
 
 
 
-def do_list_of_subs(subreddit_list,keys,date,user_list,client):
+def do_list_of_subs(subreddit_list,keys,date,user_list):
     '''
     This is the task for each process to complete when multiprocessing data scraping
     from reddit api
