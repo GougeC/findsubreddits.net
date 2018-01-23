@@ -190,7 +190,8 @@ for p in processes:
     counter+=1
 
 print('Processes Finished for subreddit data')
-
+for i in range(4):
+    open(directory+'users_list'+date+str(i)+'.txt',header=None,'w').close()
 if counter==4:
     users1 = pd.read_csv(directory+'users_list'+date+str(1)+'.txt',header=None)[0]
     users2 = pd.read_csv(directory+'users_list'+date+str(2)+'.txt',header=None)[0]
