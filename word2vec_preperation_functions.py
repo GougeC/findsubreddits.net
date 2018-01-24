@@ -106,7 +106,7 @@ def prepare_for_word2vec():
         client = pymongo.MongoClient('mongodb://ec2-54-214-228-72.us-west-2.compute.amazonaws.com:27017/')
         db = client.get_database('capstone_db')
         total_freqs = Counter()
-        for sub in list_of_subs
+        for sub in list_of_subs:
             cntr = get_sub_term_freq_for_word2vec(sub,db)
             total_freqs+=cntr
             subs_done+=1
