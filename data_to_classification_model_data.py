@@ -13,11 +13,12 @@ from keras.preprocessing.sequence import pad_sequences
 from keras.layers import Embedding, Dense, Reshape, merge
 from keras.models import Model
 import pickle
+import word2vec_preperation_functions as w2vp
 
 if __name__ == '__main__':
     client = pymongo.MongoClient('mongodb://ec2-54-214-228-72.us-west-2.compute.amazonaws.com:27017/')
     db = client.get_database('capstone_db')
-    datapoints, sub_labels, word_mapping = prepare_for_word2vec(db)
+    datapoints, sub_labels, word_mapping = w2vp.prepare_for_word2vec(db)
     reverse_dictionary = dict(zip(wm.values(), wm.keys()))
     window_size = 3
     vector_dimension = 300
