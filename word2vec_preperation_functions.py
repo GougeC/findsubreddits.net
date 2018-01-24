@@ -82,7 +82,7 @@ def map_to_numbers(db,subreddit, mapping):
     return datapoints
 
 
-def prepare_for_word2vec():
+def prepare_for_word2vec(db):
     '''
     Prepares data from my database for word2vec. Takes in the database of subreddits
     and returns a training set of numbered vectors and the mapping used to translate
@@ -91,6 +91,7 @@ def prepare_for_word2vec():
     '''
     # of words to include in vocabulary for the word2vec implementation
     number_of_words = 50000
+
     all_subs = db.posts.distinct('subreddit')
     N_subs = len(all_subs)
     p_counters = {}
