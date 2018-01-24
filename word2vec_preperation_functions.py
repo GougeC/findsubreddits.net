@@ -100,7 +100,6 @@ def prepare_for_word2vec(db):
     num_processes = 8
     n_per_p = N_subs//8
     result_q = multiprocessing.Queue()
-    subs_done = manager.Value()
     jobs = []
     t1 = time.time()
     def count_list_of_subs(list_of_subs,result_queue):
@@ -110,8 +109,6 @@ def prepare_for_word2vec(db):
         for sub in list_of_subs:
             cntr = get_sub_term_freq_for_word2vec(sub,db)
             total_freqs+=cntr
-            subs_done+=1
-            if subs_done%50==0 :print("finished :",subs_done, " subs")
         result_queue.put(total_freqs)
 
     for i in range(num_processes - 1):
