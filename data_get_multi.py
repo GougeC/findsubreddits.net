@@ -235,7 +235,7 @@ if __name__ == "__main__":
     users_unique = list(bagousers)
 
     #split the user set into 4, for each process
-    k = len(users_unique_list)//4
+    k = len(users_unique)//4
     lists = [users_unique[:k],users_unique[k:2*k],users_unique[2*k,3*k],users_unique[3*k:]]
 
     #assign each process its work and its api keys

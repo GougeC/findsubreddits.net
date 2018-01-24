@@ -110,3 +110,32 @@ def get_tf_idf_subreddits(db):
                    'subreddit_to_vec':subreddit_vectors}
 
     return return_info
+
+def text_to_tfidf(text,info_dict):
+    '''
+    Takes a string and an info_dict from the get_tf_idf_subreddits function
+    and transforms the string into a tfidf vector.
+    Returns a 1 by n_terms vector where n_terms is the number of terms in the
+    corpus the info_dict comes from.
+    '''
+    stopWords = set(stopwords.words('english'))
+    text = text.lower()
+    text = re.sub('['+string.punctuation+']', '',text)
+    cntr = Counter()
+    for word in word_tokenize(text):
+        if word not in stopWords:
+            cntr[word]+=1
+    raw_count_mat = info_dict['raw_count_matrix']
+    word_to_index = info_dict['word_to_index']
+    n_subs, n_words = raw_count_mat.shape
+    transformed = np.zeros(n_words)
+    total_terms_text = sum(cntr)
+    for term, freq in cntr.most_common():
+        if term in word_to_index:
+            t_ind = word_to_index[term]
+            rc = freq
+            n_t = np.sum(raw_count_matr[:,t_ind] > 0)
+            tf = 1 + np.log(rc)
+            idf = np.log(1+ n_subs/n_t)
+            transformed[t_ind] = (tf*idf)
+    return transformed
