@@ -15,6 +15,8 @@ import pymongo
 from sklearn.feature_extraction.text import TfidfVectorizer, TfidfTransformer
 import tensorflow as tf
 import time
+import multiprocessing
+
 def get_sub_term_freq_for_word2vec(subreddit,db):
     '''
     sub_term_freq except altered to include titles and selftext for the
@@ -22,6 +24,7 @@ def get_sub_term_freq_for_word2vec(subreddit,db):
     '''
     #assigning stopwords from nltk.stopwords
     #getting posts from the database
+
     posts = db.posts.find({'subreddit':subreddit},{'data.comments':1,'data.title':1,'data.selftext':1})
     sub_counter = Counter()
     #looping over the posts
@@ -79,7 +82,7 @@ def map_to_numbers(db,subreddit, mapping):
     return datapoints
 
 
-def prepare_for_word2vec(db):
+def prepare_for_word2vec():
     '''
     Prepares data from my database for word2vec. Takes in the database of subreddits
     and returns a training set of numbered vectors and the mapping used to translate
@@ -90,21 +93,43 @@ def prepare_for_word2vec(db):
     number_of_words = 50000
     all_subs = db.posts.distinct('subreddit')
     N_subs = len(all_subs)
-    sub_counters = {}
-    total_freqs = Counter()
+    p_counters = {}
     #counting all the words in the corpus
     i = 0
+    num_processes = 8
+    n_per_p = N_subs//8
+    result_q = multiprocessing.Queue()
+    subs_done = manager.Value()
+    jobs = []
     t1 = time.time()
-    for sub in all_subs:
-        i+=1
-        if i%10==0:
-            print("counting sub: {}. {}/618 subreddits".format(sub,i))
-            t2 = time.time()
-            print("total time elapsed: {} seconds".format(t2 - t1))
+    def count_list_of_subs(list_of_subs,result_queue):
+        client = pymongo.MongoClient('mongodb://ec2-54-214-228-72.us-west-2.compute.amazonaws.com:27017/')
+        db = client.get_database('capstone_db')
+        total_freqs = Counter()
+        for sub in list_of_subs
+            cntr = get_sub_term_freq_for_word2vec(sub,db)
+            total_freqs+=cntr
+            subs_done+=1
+            if subs_done%50==0 :print("finished :",subs_done, " subs")
+        result_queue.put(total_freqs)
 
-        cntr = get_sub_term_freq_for_word2vec(sub,db)
-        total_freqs+=cntr
-        sub_counters[sub] = cntr
+    for i in range(num_processes - 1):
+        proc_list = all_subs[i*n_per_p:(i+1)*n_per_p]
+        p = multiprocessing.Process(target = count_list_of_subs(proc_list,result_q))
+        jobs.append(p)
+
+    proc_list = all_subs[7*n_per_p:]
+    p = multiprocessing.Process(target = count_list_of_subs(proc_list,result_q))
+    jobs.append(p)
+
+    for job in jobs: job.start()
+    for job in jobs: job.join()
+
+    final_counter = Counter()
+    while not result_queue.empty():
+        final_counter+=esult_queue.get()
+    total_freqs = final_counter
+
     t2 = time.time()
     print("counting subs took {} seconds".format(t2-t1))
 
