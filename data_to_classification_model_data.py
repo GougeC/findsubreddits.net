@@ -29,8 +29,10 @@ def get_features_from_num(num,reverse_dictionary,feature_mat):
 if __name__ == '__main__':
     client = pymongo.MongoClient('mongodb://ec2-54-214-228-72.us-west-2.compute.amazonaws.com:27017/')
     db = client.get_database('capstone_db')
-
-    datapoints, sub_labels, word_mapping = w2vp.prepare_for_word2vec(db,50000)
+    vocab_size = 50000
+    #create mapped data from web text
+    datapoints, sub_labels, word_mapping = w2vp.prepare_for_word2vec(db,vocab_size)
+    validating = False
     reverse_dictionary = dict(zip(wm.values(), wm.keys()))
     window_size = 3
     vector_dimension = 300
@@ -38,15 +40,21 @@ if __name__ == '__main__':
     validation_size = 16
     validation_window = 100
     validation_examples = np.random.choice(validation_window, validation_size, replace=False)
-    vocab_size = 50000
+    with open('wordmapping.pkl','wb') as f:
+        pickle.dump(word_mapping,f)
+    with open('sub_labels.pkl','wb')as f:
+        pickle.dump(sub_labels,f)
+    with open('datapoints.pkl','wb')as f:
+        pickle.dump(datapoints,f)
+
 
     num_samples = len(datapoints)
     max_length = 100
     word_mapping['NONCE'] = vocab_size+1
+    reverse_dictionary[vocan_size+1] = 'NONCE'
     datapoints = pad_sequences(datapoints, maxlen = max_length, dtype = 'int32',
                                      padding = 'post', truncating = 'post', value = vocab_size+1)
-
-
+    # making skipgram training pairs to train the word embedding
     input_datappints = []
     for d in datapoints:
         sampling_table = sequence.make_sampling_table(vocab_size)
@@ -58,7 +66,7 @@ if __name__ == '__main__':
                                 'word_context':word_context,
                                 'labels': labels})
 
-
+    #creating the wordembedding network
     input_target = keras.Input((1,))
     input_context = keras.Input((1,))
     embedding = Embedding(vocab_size,vector_dimension,
@@ -77,7 +85,7 @@ if __name__ == '__main__':
     model.compile(loss='binary_crossentropy', optimizer='adam')
 
     validation_model = Model(input = [input_target,input_context], output=similarity)
-
+    # a class for call back for validating mid training
     class SimilarityCallback:
         def run_sim(self):
             for i in range(valid_size):
@@ -102,6 +110,8 @@ if __name__ == '__main__':
                 return sim
 
     sim_cb = SimilarityCallback()
+    #training the network
+    #this makes sure to train the network on every sample
     w_target = np.zeros((1,))
     w_context = np.zeros((1,))
     lbls = np.zeros((1,))
@@ -118,8 +128,9 @@ if __name__ == '__main__':
             cnt+=1
             if cnt%100 == 0:
                 print("Interation {}, loss = {}".format(cnt,loss))
-            if cnt%1000 == 0:
-                sim_sib.run_sim()
+            if validating = True
+                if cnt%1000 == 0:
+                    sim_sib.run_sim()
 
     featurized = model.layers[0].get_weights()
     print(featurized.shape)

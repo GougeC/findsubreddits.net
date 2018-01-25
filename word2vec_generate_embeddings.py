@@ -56,6 +56,7 @@ model.compile(loss='binary_crossentropy', optimizer='adam')
 
 validation_model = Model(input = [input_target,input_context], output=similarity)
 
+
 class SimilarityCallback:
     def run_sim(self):
         for i in range(valid_size):

@@ -104,6 +104,9 @@ def count_one_sub(sub):
     return get_sub_term_freq_for_word2vec(sub,db)
 
 def label_datapoints(data):
+    '''
+    returns an list of numpy arrays of mapped datapoints and an array of matching labels, in order
+    '''
     datapoints = []
     labels = []
     for sub, points in data:
@@ -162,7 +165,7 @@ def prepare_for_word2vec(db, number_of_words):
     results = pool.map(count_one_sub,all_subs)
     final_counter = Counter()
     for r in results:
-        final_counter+= results
+        final_counter += r
     t2 = time.time()
     print("counting subs took {} seconds".format(t2-t1))
     print("creating word map...")
