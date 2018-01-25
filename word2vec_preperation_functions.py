@@ -107,9 +107,11 @@ def prepare_for_word2vec(db):
         db = client.get_database('capstone_db')
         total_freqs = Counter()
         for sub in list_of_subs:
+            t2 = time.time()
             cntr = get_sub_term_freq_for_word2vec(sub,db)
             total_freqs+=cntr
-            print("Finished Counting for {}".format(sub))
+            t3 = time.time()
+            print("Finished Counting for {},({} seconds, {} seconds total)".format(sub,t3-t2,t3-t1))
         result_queue.put(total_freqs)
 
     for i in range(num_processes - 1):
