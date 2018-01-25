@@ -15,11 +15,22 @@ from keras.models import Model
 import pickle
 import word2vec_preperation_functions as w2vp
 
+def get_featurized_word(word,word_map,feature_mat):
+    if word in word_map:
+        return feature_map[word_map[word],:]
+    else:
+        return feature_map[word_map['UNK'],:]
+def get_features_from_num(num,reverse_dictionary,feature_mat):
+    if num in reverse_dictionary:
+        return feature_mat[num,:]
+    else:
+        return feature_mat[0,:]
+
 if __name__ == '__main__':
     client = pymongo.MongoClient('mongodb://ec2-54-214-228-72.us-west-2.compute.amazonaws.com:27017/')
     db = client.get_database('capstone_db')
 
-    datapoints, sub_labels, word_mapping = w2vp.prepare_for_word2vec(db)
+    datapoints, sub_labels, word_mapping = w2vp.prepare_for_word2vec(db,50000)
     reverse_dictionary = dict(zip(wm.values(), wm.keys()))
     window_size = 3
     vector_dimension = 300
@@ -119,16 +130,6 @@ if __name__ == '__main__':
         pickle.dump(featurized,f)
 
 
-    def get_featurized_word(word,word_map,feature_mat):
-        if word in word_map:
-            return feature_map[word_map[word],:]
-        else:
-            return feature_map[word_map['UNK'],:]
-    def get_features_from_num(num,reverse_dictionary,feature_mat):
-        if num in reverse_dictionary:
-            return feature_mat[num,:]
-        else:
-            return feature_mat[0,:]
 
     X = []
     for point in datapoints:

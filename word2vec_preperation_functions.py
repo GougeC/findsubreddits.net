@@ -17,6 +17,7 @@ import tensorflow as tf
 import time
 import multiprocessing
 
+
 def get_sub_term_freq_for_word2vec(subreddit,db):
     '''
     sub_term_freq except altered to include titles and selftext for the
@@ -24,7 +25,8 @@ def get_sub_term_freq_for_word2vec(subreddit,db):
     '''
     #assigning stopwords from nltk.stopwords
     #getting posts from the database
-
+    t1 = time.time()
+    print('getting r/{}'.format(subreddit))
     posts = db.posts.find({'subreddit':subreddit},{'data.comments':1,'data.title':1,'data.selftext':1})
     sub_counter = Counter()
     #looping over the posts
@@ -47,11 +49,17 @@ def get_sub_term_freq_for_word2vec(subreddit,db):
             selftext = re.sub('['+string.punctuation+']', '', selftext)
             for word in word_tokenize(selftext):
                 sub_counter[word]+=1
+    t2 = time.time()
+    print("finished r/{} in {} s".format(subreddit,t2-t1))
     return sub_counter
-
-def map_to_numbers(db,subreddit, mapping):
+def clean_comment(com):
+    com = com.lower()
+    com = re.sub('['+string.punctuation+']', '', com)
+    tokenized = word_tokenize(com)
+    return tokenized
+def map_to_numbers(db,subreddit,mapping):
     '''
-    Takes in a mongodb instance a subreddit name and a mapping and creates numpy vectors that
+    Takes in a mongodb instance, a subreddit name and a mapping and creates numpy vectors that
     can be used in a word2vec implementation by mapping each word to an integer, and words not in
     the vocabulary to "UNK"
     '''
@@ -67,9 +75,7 @@ def map_to_numbers(db,subreddit, mapping):
         if selftext:
             comments.append(selftext)
         for com in comments:
-            com = com.lower()
-            com = re.sub('['+string.punctuation+']', '', com)
-            tokenized = word_tokenize(com)
+            tokenized = clean_comment(com)
             vect = []
             #maps the tokenized vector to a numeric vector mapping words not in mapping to UNK
             for t in tokenized:
@@ -79,62 +85,41 @@ def map_to_numbers(db,subreddit, mapping):
                     vect.append(mapping['UNK'])
             datapoints.append(np.array(vect))
 
-    return datapoints
+    return (subreddit,datapoints)
 
+def map_one_sub(subreddit,mapping):
+    db = connect_to_mongo()
+    return map_to_numbers(db,subreddit,mapping)
 
-def prepare_for_word2vec(db):
+def connect_to_mongo():
+    client = pymongo.MongoClient('mongodb://ec2-54-214-228-72.us-west-2.compute.amazonaws.com:27017/')
+    db = client.get_database('capstone_db')
+    return db
+
+def count_one_sub(sub):
     '''
-    Prepares data from my database for word2vec. Takes in the database of subreddits
-    and returns a training set of numbered vectors and the mapping used to translate
-    them to integers. Additionally this returns vector of labels to use to train a classifier
-    on after training word2vec
+    helper function to connect to db before calling get_sub_term_freq_for_word2vec
     '''
-    # of words to include in vocabulary for the word2vec implementation
-    number_of_words = 50000
+    db = connect_to_mongo()
+    return get_sub_term_freq_for_word2vec(sub,db)
 
-    all_subs = db.posts.distinct('subreddit')
-    N_subs = len(all_subs)
-    p_counters = {}
-    #counting all the words in the corpus
-    i = 0
-    num_processes = 4
-    n_per_p = N_subs//num_processes
-    result_q = multiprocessing.Queue()
-    jobs = []
-    t1 = time.time()
-    def count_list_of_subs(list_of_subs,result_queue):
-        client = pymongo.MongoClient('mongodb://ec2-54-214-228-72.us-west-2.compute.amazonaws.com:27017/')
-        db = client.get_database('capstone_db')
-        total_freqs = Counter()
-        for sub in list_of_subs:
-            t2 = time.time()
-            cntr = get_sub_term_freq_for_word2vec(sub,db)
-            total_freqs+=cntr
-            t3 = time.time()
-            print("Finished Counting for {},({} seconds, {} seconds total)".format(sub,t3-t2,t3-t1))
-        result_queue.put(total_freqs)
-
-    for i in range(num_processes - 1):
-        proc_list = all_subs[i*n_per_p:(i+1)*n_per_p]
-        p = multiprocessing.Process(target = count_list_of_subs(proc_list,result_q))
-        jobs.append(p)
-
-    proc_list = all_subs[(num_processes-1)*n_per_p:]
-    p = multiprocessing.Process(target = count_list_of_subs(proc_list,result_q))
-    jobs.append(p)
-
-    for job in jobs: job.start()
-    for job in jobs: job.join()
-
-    final_counter = Counter()
-    while not result_q.empty():
-        final_counter+=result_q.get()
-    total_freqs = final_counter
-
-    t2 = time.time()
-    print("counting subs took {} seconds".format(t2-t1))
+def label_datapoints(data):
+    datapoints = []
+    labels = []
+    for sub, points in data:
+        for p in points:
+            datapoints.append(np.array(p))
+            labels.append(sub)
+    return datapoints,labels
 
     #creating the word mapping of the (number of words) most common words
+
+def create_mapping(frequencies,number_of_words):
+    '''
+    Creates a word mapping dictionary based on the frequencies
+    that are passed in. Creates a mapping for as many words as passed
+    into number_of_words
+    '''
     counts = [('UNK',-1)]
     counts.extend(total_freqs.most_common(number_of_words - 1))
     word_mapping = {}
@@ -142,26 +127,46 @@ def prepare_for_word2vec(db):
     for word, c in counts:
         word_mapping[word] = len(word_mapping)
 
-    #labeling and mapping the training data
+    return word_mapping
+
+def map_subreddits(all_subs,word_mapping):
+    '''
+    maps every subreddit using the sublist and the mapping passed in
+    '''
     datapoints = []
     labels = []
     print("Beginning to label and transform subreddits")
-    i=0
-    t3 = time.time()
-    for sub in all_subs:
-        i+=1
-        if i%20==0:
-            print("mapping and labeling r/{}. {}/618 subs".format(sub,i))
-            t2 = time.time()
-            print("total time elapsed: {}".format(t2 - t1))
-        s_data = map_to_numbers(db,sub,word_mapping)
-        for d in s_data:
-            datapoints.append(d)
-            labels.append(sub)
+    t1 = time.time()
+    pool = multiprocessing.Pool(4)
+    results = pool.map(map_one_sub(),args = (all_subs,word_mapping))
     #turning these into numpy arrays
     t2 = time.time()
-    print("mapping subs took {} seconds".format(t2-t3))
-    datapoints = np.array(datapoints)
-    labels = np.array(labels)
-    print("total time elapsed: {}".format(t2 - t1))
+    print("mapping subs took {} seconds".format(t2-t1))
+    return results
+
+def prepare_for_word2vec(db, number_of_words):
+    '''
+    Prepares data from my database for word2vec. Takes in the database of subreddits and the
+    number of words to include in the vocabulary for the mapping
+    and returns a training set of numbered vectors and the mapping used to translate
+    them to integers. Additionally this returns vector of labels to use to train a classifier
+    on after training word2vec
+    '''
+    # of words to include in vocabulary for the word2vec implementation
+    t1 = time.time()
+    all_subs = db.posts.distinct('subreddit')
+    N_subs = len(all_subs)
+    p_counters = {}
+    #counting all the words in the corpus
+    pool = multiprocessing.Pool(4)
+    results = pool.map(count_one_sub,all_subs)
+    final_counter = Counter()
+    for r in results:
+        final_counter+= results
+    t2 = time.time()
+    print("counting subs took {} seconds".format(t2-t1))
+    print("creating word map...")
+    word_mapping = create_mapping(final_counter, number_of_words)
+    data = map_subreddits(all_subs,word_mapping)
+    datapoints, labels = label_datapoints(data)
     return datapoints, labels, word_mapping
