@@ -1,4 +1,4 @@
-# Topic Modeling and Recommendation of Reddit Communities
+# Topic Modeling and Recommendation with Reddit (WIP)
 
 ## Capstone project for Galvanize data science immersive program
 
