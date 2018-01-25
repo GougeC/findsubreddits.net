@@ -128,7 +128,7 @@ if __name__ == '__main__':
             cnt+=1
             if cnt%100 == 0:
                 print("Interation {}, loss = {}".format(cnt,loss))
-            if validating = True
+            if validating == True:
                 if cnt%1000 == 0:
                     sim_sib.run_sim()
 
