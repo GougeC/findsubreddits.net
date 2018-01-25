@@ -97,7 +97,7 @@ def prepare_for_word2vec(db):
     p_counters = {}
     #counting all the words in the corpus
     i = 0
-    num_processes = 16
+    num_processes = 4
     n_per_p = N_subs//num_processes
     result_q = multiprocessing.Queue()
     jobs = []
@@ -109,6 +109,7 @@ def prepare_for_word2vec(db):
         for sub in list_of_subs:
             cntr = get_sub_term_freq_for_word2vec(sub,db)
             total_freqs+=cntr
+            print("Finished Counting for {}".format(sub))
         result_queue.put(total_freqs)
 
     for i in range(num_processes - 1):
@@ -124,8 +125,8 @@ def prepare_for_word2vec(db):
     for job in jobs: job.join()
 
     final_counter = Counter()
-    while not result_queue.empty():
-        final_counter+=esult_queue.get()
+    while not result_q.empty():
+        final_counter+=result_q.get()
     total_freqs = final_counter
 
     t2 = time.time()
