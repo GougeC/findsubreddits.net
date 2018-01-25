@@ -124,7 +124,7 @@ def create_mapping(frequencies,number_of_words):
     into number_of_words
     '''
     counts = [('UNK',-1)]
-    counts.extend(total_freqs.most_common(number_of_words - 1))
+    counts.extend(frequencies.most_common(number_of_words - 1))
     word_mapping = {}
     print("creating word mapping")
     for word, c in counts:
