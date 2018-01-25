@@ -97,8 +97,8 @@ def prepare_for_word2vec(db):
     p_counters = {}
     #counting all the words in the corpus
     i = 0
-    num_processes = 8
-    n_per_p = N_subs//8
+    num_processes = 16
+    n_per_p = N_subs//num_processes
     result_q = multiprocessing.Queue()
     jobs = []
     t1 = time.time()
@@ -116,7 +116,7 @@ def prepare_for_word2vec(db):
         p = multiprocessing.Process(target = count_list_of_subs(proc_list,result_q))
         jobs.append(p)
 
-    proc_list = all_subs[7*n_per_p:]
+    proc_list = all_subs[(num_processes-1)*n_per_p:]
     p = multiprocessing.Process(target = count_list_of_subs(proc_list,result_q))
     jobs.append(p)
 
