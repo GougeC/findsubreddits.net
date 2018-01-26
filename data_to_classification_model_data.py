@@ -9,7 +9,7 @@ from nltk import word_tokenize
 import tensorflow as tf
 import time
 import random
-from keras.preprocessing.sequence import pad_sequences
+from keras.preprocessing.sequence import pad_sequences,make_sampling_table,skipgrams
 from keras.layers import Embedding, Dense, Reshape, merge
 from keras.models import Model
 import pickle
@@ -25,15 +25,29 @@ def get_features_from_num(num,reverse_dictionary,feature_mat):
         return feature_mat[num,:]
     else:
         return feature_mat[0,:]
+def make_input_datapoints(datapoints,labels,vocab_size):
+    input_datapoints = []
+    for data in datapoints:
+        sampling_table = make_sampling_table(vocab_size)
+        couples, labels = skipgrams(data, vocab_size, window_size=3, sampling_table=sampling_table)
+        word_target, word_context = zip(*couples)
+        word_target = np.array(word_target,dtype = "int32")
+        word_context = np.array(word_context,dtype = "int32")
+        input_datapoints.append({'word_target':word_target,
+                                'word_context':word_context,
+                                'labels': labels})
+    return input_datapoints
 
 if __name__ == '__main__':
     client = pymongo.MongoClient('mongodb://ec2-54-214-228-72.us-west-2.compute.amazonaws.com:27017/')
     db = client.get_database('capstone_db')
-    vocab_size = 50000
+    vocab_size = 10000
+
     #create mapped data from web text
     datapoints, sub_labels, word_mapping = w2vp.prepare_for_word2vec(db,vocab_size,True)
     validating = False
-    reverse_dictionary = dict(zip(wm.values(), wm.keys()))
+    reverse_dictionary = dict(zip(word_mapping.values(), word_mapping.keys()))
+    vocab_size = len(word_mapping)+1
     window_size = 3
     vector_dimension = 300
     epochs = 1000
@@ -50,27 +64,19 @@ if __name__ == '__main__':
 
     num_samples = len(datapoints)
     max_length = 100
-    word_mapping['NONCE'] = vocab_size+1
-    reverse_dictionary[vocan_size+1] = 'NONCE'
+    print(list(word_mapping.keys())[-1])
+    word_mapping['NONCE'] = vocab_size
+    reverse_dictionary[vocab_size] = 'NONCE'
     datapoints = pad_sequences(datapoints, maxlen = max_length, dtype = 'int32',
-                                     padding = 'post', truncating = 'post', value = vocab_size+1)
+                                     padding = 'post', truncating = 'post', value = vocab_size)
+    print(len(datapoints))
+    print(datapoints[0].shape)
     # making skipgram training pairs to train the word embedding
-    input_datappints = []
-    for d in datapoints:
-        sampling_table = sequence.make_sampling_table(vocab_size)
-        couples, labels = skipgrams(data, vocab_size, window_size=window_size, sampling_table=sampling_table)
-        word_target, word_context = zip(*couples)
-        word_target = np.array(word_target,dtype = "int32")
-        word_context = np.array(word_context,dtype = "int32")
-        input_datapoints.append({'word_target':word_target,
-                                'word_context':word_context,
-                                'labels': labels})
-
+    input_datapoints = make_input_datapoints(datapoints,sub_labels,vocab_size)
     #creating the wordembedding network
     input_target = keras.Input((1,))
     input_context = keras.Input((1,))
-    embedding = Embedding(vocab_size,vector_dimension,
-                                        input_length =1, name = 'word_embedding')
+    embedding = Embedding(vocab_size,vector_dimension,input_length =1, name = 'word_embedding')
     target = embedding(input_target)
     target = Reshape((vector_dimension,1))(target)
     context = embedding(input_context)

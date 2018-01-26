@@ -19,7 +19,7 @@ import multiprocessing
 import pickle
 from multiprocessing import Process
 
-
+word_mapping = None
 def get_sub_term_freq_for_word2vec(subreddit,db):
     '''
     sub_term_freq except altered to include titles and selftext for the
@@ -59,13 +59,14 @@ def clean_comment(com):
     com = re.sub('['+string.punctuation+']', '', com)
     tokenized = word_tokenize(com)
     return tokenized
-def map_to_numbers(db,subreddit,mapping):
+def map_to_numbers(db,subreddit):
     '''
     Takes in a mongodb instance, a subreddit name and a mapping and creates numpy vectors that
     can be used in a word2vec implementation by mapping each word to an integer, and words not in
     the vocabulary to "UNK"
     '''
     #gets data from mongodb
+    global word_mapping
     t1 = time.time()
     print("mapping r/{}".format(subreddit))
     posts = db.posts.find({'subreddit':subreddit},{'data.comments':1,'data.title':1,'data.selftext':1})
@@ -83,18 +84,18 @@ def map_to_numbers(db,subreddit,mapping):
             vect = []
             #maps the tokenized vector to a numeric vector mapping words not in mapping to UNK
             for t in tokenized:
-                if t in mapping:
-                    vect.append(mapping[t])
+                if t in word_mapping:
+                    vect.append(word_mapping[t])
                 else:
-                    vect.append(mapping['UNK'])
+                    vect.append(word_mapping['UNK'])
             datapoints.append(np.array(vect))
     t2 = time.time()
     print("finished mapping r/{}, {}s".format(subreddit,t2-t1))
     return (subreddit,datapoints)
 
-def map_one_sub(subreddit,mapping):
+def map_one_sub(subreddit):
     db = connect_to_mongo()
-    return map_to_numbers(db,subreddit,mapping)
+    return map_to_numbers(db,subreddit)
 def map_sub_list(lst,mapping,i,res_dict):
     db = connect_to_mongo()
     res = []
@@ -143,7 +144,7 @@ def create_mapping(frequencies,number_of_words):
 
     return word_mapping
 
-def map_subreddits_pool(all_subs,word_mapping):
+def map_subreddits_pool(all_subs):
     '''
     maps every subreddit using the sublist and the mapping passed in
     '''
@@ -152,7 +153,7 @@ def map_subreddits_pool(all_subs,word_mapping):
     print("Beginning to label and transform subreddits")
     t1 = time.time()
     pool = multiprocessing.Pool(4)
-    results = pool.map(map_one_sub,args = (all_subs,word_mapping))
+    results = pool.map(map_one_sub,all_subs)
     #turning these into numpy arrays
     t2 = time.time()
     print("mapping subs took {} seconds".format(t2-t1))
@@ -185,6 +186,8 @@ def prepare_for_word2vec(db, number_of_words,map_done = True):
     '''
     # of words to include in vocabulary for the word2vec implementation
     all_subs = db.posts.distinct('subreddit')
+    global word_mapping
+    all_subs = all_subs[:8]
     if not map_done:
         t1 = time.time()
         N_subs = len(all_subs)
@@ -198,13 +201,15 @@ def prepare_for_word2vec(db, number_of_words,map_done = True):
         t2 = time.time()
         print("counting subs took {} seconds".format(t2-t1))
         print("creating word map...")
+
         word_mapping = create_mapping(final_counter, number_of_words)
         with open('wordmapping.pkl','wb') as f:
             pickle.dump(word_mapping,f)
-        map
     if map_done:
         with open('wordmapping.pkl','rb') as f:
             word_mapping = pickle.load(f)
-    data = map_subreddits_multiproc(all_subs,word_mapping)
+    if word_mapping:
+        print("it exists")
+    data = map_subreddits_pool(all_subs)
     datapoints, labels = label_datapoints(data)
     return datapoints, labels, word_mapping
