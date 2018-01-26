@@ -66,6 +66,8 @@ def map_to_numbers(db,subreddit,mapping):
     the vocabulary to "UNK"
     '''
     #gets data from mongodb
+    t1 = time.time()
+    print("mapping r/{}".format(subreddit))
     posts = db.posts.find({'subreddit':subreddit},{'data.comments':1,'data.title':1,'data.selftext':1})
     datapoints = []
     #iterates over the comments title and selftext of every post in the subreddit in the database
@@ -86,7 +88,8 @@ def map_to_numbers(db,subreddit,mapping):
                 else:
                     vect.append(mapping['UNK'])
             datapoints.append(np.array(vect))
-
+    t2 = time.time()
+    print("finished mapping r/{}, {}s".format(subreddit,t2-t1))
     return (subreddit,datapoints)
 
 def map_one_sub(subreddit,mapping):
