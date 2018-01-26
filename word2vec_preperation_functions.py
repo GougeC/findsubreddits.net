@@ -162,7 +162,7 @@ def map_subreddits_multiproc(all_subs,word_mapping):
     return_dict = manager.dict()
     procs = []
     for i in range(4):
-        p = Process(target = do_list_of_subs,args = (sub_list[i],mapping,i,return_dict))
+        p = Process(target = map_sub_list,args = (sub_list[i],mapping,i,return_dict))
         procs.append(p)
     for p in procs:
         p.start()
