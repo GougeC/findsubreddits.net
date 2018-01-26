@@ -31,7 +31,7 @@ if __name__ == '__main__':
     db = client.get_database('capstone_db')
     vocab_size = 50000
     #create mapped data from web text
-    datapoints, sub_labels, word_mapping = w2vp.prepare_for_word2vec(db,vocab_size)
+    datapoints, sub_labels, word_mapping = w2vp.prepare_for_word2vec(db,vocab_size,True)
     validating = False
     reverse_dictionary = dict(zip(wm.values(), wm.keys()))
     window_size = 3

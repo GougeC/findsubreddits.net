@@ -17,6 +17,7 @@ import tensorflow as tf
 import time
 import multiprocessing
 import pickle
+from multiprocessing import Process
 
 
 def get_sub_term_freq_for_word2vec(subreddit,db):
@@ -91,6 +92,12 @@ def map_to_numbers(db,subreddit,mapping):
 def map_one_sub(subreddit,mapping):
     db = connect_to_mongo()
     return map_to_numbers(db,subreddit,mapping)
+def map_sub_list(lst,mapping,i,res_dict):
+    db = connect_to_mongo()
+    res = []
+    for s in lst:
+        res.append(map_to_numbers(db,s,mapping))
+    res_dict[i] = res
 
 def connect_to_mongo():
     client = pymongo.MongoClient('mongodb://ec2-54-214-228-72.us-west-2.compute.amazonaws.com:27017/')
@@ -133,7 +140,7 @@ def create_mapping(frequencies,number_of_words):
 
     return word_mapping
 
-def map_subreddits(all_subs,word_mapping):
+def map_subreddits_pool(all_subs,word_mapping):
     '''
     maps every subreddit using the sublist and the mapping passed in
     '''
@@ -147,8 +154,25 @@ def map_subreddits(all_subs,word_mapping):
     t2 = time.time()
     print("mapping subs took {} seconds".format(t2-t1))
     return results
-
-def prepare_for_word2vec(db, number_of_words):
+def map_subreddits_multiproc(all_subs,word_mapping):
+    N = len(all_subs)
+    k = N//4
+    sub_lists = [all_subs[:n],all_subs[n:2*n],all_subs[n:3*n],all_subs[3*n:]]
+    manager = multiprocessing.Manager()
+    return_dict = manager.dict()
+    procs = []
+    for i in range(4):
+        p = Process(target = do_list_of_subs,args = (sub_list[i],mapping,i,return_dict))
+        procs.append(p)
+    for p in procs:
+        p.start()
+    for p in procs:
+        p.join()
+    results = []
+    for i in range(4):
+        results.append(return_dict[i])
+    return results
+def prepare_for_word2vec(db, number_of_words,map_done = True):
     '''
     Prepares data from my database for word2vec. Takes in the database of subreddits and the
     number of words to include in the vocabulary for the mapping
@@ -157,23 +181,27 @@ def prepare_for_word2vec(db, number_of_words):
     on after training word2vec
     '''
     # of words to include in vocabulary for the word2vec implementation
-    t1 = time.time()
     all_subs = db.posts.distinct('subreddit')
-    N_subs = len(all_subs)
-    p_counters = {}
-    #counting all the words in the corpus
-    pool = multiprocessing.Pool(4)
-    results = pool.map(count_one_sub,all_subs)
-    final_counter = Counter()
-    for r in results:
-        final_counter += r
-    t2 = time.time()
-    print("counting subs took {} seconds".format(t2-t1))
-    print("creating word map...")
-    word_mapping = create_mapping(final_counter, number_of_words)
-    with open('wordmapping.pkl','wb') as f:
-        pickle.dump(word_mapping,f)
-
-    data = map_subreddits(all_subs,word_mapping)
+    if not map_done:
+        t1 = time.time()
+        N_subs = len(all_subs)
+        p_counters = {}
+        #counting all the words in the corpus
+        pool = multiprocessing.Pool(4)
+        results = pool.map(count_one_sub,all_subs)
+        final_counter = Counter()
+        for r in results:
+            final_counter += r
+        t2 = time.time()
+        print("counting subs took {} seconds".format(t2-t1))
+        print("creating word map...")
+        word_mapping = create_mapping(final_counter, number_of_words)
+        with open('wordmapping.pkl','wb') as f:
+            pickle.dump(word_mapping,f)
+        map
+    if map_done:
+        with open('word_mapping.pkl','rn') as f:
+            word_mapping = pickle.load(f)
+    data = map_subreddits_multiproc(all_subs,word_mapping)
     datapoints, labels = label_datapoints(data)
     return datapoints, labels, word_mapping
