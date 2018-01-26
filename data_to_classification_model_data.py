@@ -40,7 +40,7 @@ if __name__ == '__main__':
     validation_size = 16
     validation_window = 100
     validation_examples = np.random.choice(validation_window, validation_size, replace=False)
-    with open('wordmapping.pkl','wb') as f:
+    with open('wordmapping1.pkl','wb') as f:
         pickle.dump(word_mapping,f)
     with open('sub_labels.pkl','wb')as f:
         pickle.dump(sub_labels,f)
