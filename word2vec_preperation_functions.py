@@ -200,7 +200,7 @@ def prepare_for_word2vec(db, number_of_words,map_done = True):
             pickle.dump(word_mapping,f)
         map
     if map_done:
-        with open('word_mapping.pkl','rb') as f:
+        with open('wordmapping.pkl','rb') as f:
             word_mapping = pickle.load(f)
     data = map_subreddits_multiproc(all_subs,word_mapping)
     datapoints, labels = label_datapoints(data)
