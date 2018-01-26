@@ -16,6 +16,7 @@ from sklearn.feature_extraction.text import TfidfVectorizer, TfidfTransformer
 import tensorflow as tf
 import time
 import multiprocessing
+import pickle
 
 
 def get_sub_term_freq_for_word2vec(subreddit,db):
