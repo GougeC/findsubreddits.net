@@ -157,7 +157,7 @@ def map_subreddits_pool(all_subs,word_mapping):
 def map_subreddits_multiproc(all_subs,word_mapping):
     N = len(all_subs)
     k = N//4
-    sub_lists = [all_subs[:n],all_subs[n:2*n],all_subs[n:3*n],all_subs[3*n:]]
+    sub_lists = [all_subs[:k],all_subs[k:2*k],all_subs[k:3*k],all_subs[3*k:]]
     manager = multiprocessing.Manager()
     return_dict = manager.dict()
     procs = []
