@@ -141,7 +141,7 @@ def map_subreddits(all_subs,word_mapping):
     print("Beginning to label and transform subreddits")
     t1 = time.time()
     pool = multiprocessing.Pool(4)
-    results = pool.map(map_one_sub(),args = (all_subs,word_mapping))
+    results = pool.map(map_one_sub,args = (all_subs,word_mapping))
     #turning these into numpy arrays
     t2 = time.time()
     print("mapping subs took {} seconds".format(t2-t1))
