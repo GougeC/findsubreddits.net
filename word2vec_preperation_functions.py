@@ -104,7 +104,10 @@ def map_sub_list(lst,mapping,i,res_dict):
     res_dict[i] = res
 
 def connect_to_mongo():
-    client = pymongo.MongoClient('mongodb://ec2-54-214-228-72.us-west-2.compute.amazonaws.com:27017/')
+    with open('keys/mongoconnect.txt') as f:
+        s = f.read()
+    s = s[:-1]
+    client = pymongo.MongoClient(s)
     db = client.get_database('capstone_db')
     return db
 

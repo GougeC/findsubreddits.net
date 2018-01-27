@@ -49,7 +49,10 @@ def create_input_point(point):
     return input_datapoint
 
 if __name__ == '__main__':
-    client = pymongo.MongoClient('mongodb://ec2-54-214-228-72.us-west-2.compute.amazonaws.com:27017/')
+    with open('keys/mongoconnect.txt') as f:
+        s = f.read()
+    s = s[:-1]
+    client = pymongo.MongoClient(s)
     db = client.get_database('capstone_db')
     vocab_size = 10000
 
