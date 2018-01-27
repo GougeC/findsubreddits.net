@@ -57,7 +57,7 @@ if __name__ == '__main__':
     vocab_size = 10000
 
     #create mapped data from web text
-    datapoints, sub_labels, word_mapping = w2vp.prepare_for_word2vec(db,vocab_size,False)
+    datapoints, sub_labels, word_mapping = w2vp.prepare_for_word2vec(db,vocab_size,True)
     validating = False
     reverse_dictionary = dict(zip(word_mapping.values(), word_mapping.keys()))
     word_mapping['NONCE'] = vocab_size
@@ -70,10 +70,10 @@ if __name__ == '__main__':
     validation_size = 16
     validation_window = 100
     validation_examples = np.random.choice(validation_window, validation_size, replace=False)
-    with open('wordmapping1.pkl','wb') as f:
-        pickle.dump(word_mapping,f)
-    with open('sub_labels.pkl','wb')as f:
-        pickle.dump(sub_labels,f)
+#    with open('wordmapping1.pkl','wb') as f:
+#        pickle.dump(word_mapping,f)
+#    with open('sub_labels.pkl','wb')as f:
+#        pickle.dump(sub_labels,f)
     with open('datapoints.pkl','wb')as f:
         pickle.dump(datapoints,f)
 
