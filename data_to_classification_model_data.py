@@ -54,7 +54,7 @@ if __name__ == '__main__':
     vocab_size = 10000
 
     #create mapped data from web text
-    datapoints, sub_labels, word_mapping = w2vp.prepare_for_word2vec(db,vocab_size,True)
+    datapoints, sub_labels, word_mapping = w2vp.prepare_for_word2vec(db,vocab_size,False)
     validating = False
     reverse_dictionary = dict(zip(word_mapping.values(), word_mapping.keys()))
     word_mapping['NONCE'] = vocab_size

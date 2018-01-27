@@ -189,7 +189,6 @@ def prepare_for_word2vec(db, number_of_words,map_done = True):
     number_cores = multiprocessing.cpu_count()
     all_subs = db.posts.distinct('subreddit')
     global word_mapping
-    all_subs = all_subs[:8]
     if not map_done:
         t1 = time.time()
         N_subs = len(all_subs)
