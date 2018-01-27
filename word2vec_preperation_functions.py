@@ -205,7 +205,6 @@ def prepare_for_word2vec(db, number_of_words,map_done = True):
         t2 = time.time()
         print("counting subs took {} seconds".format(t2-t1))
         print("creating word map...")
-
         word_mapping = create_mapping(final_counter, number_of_words)
         with open('wordmapping.pkl','wb') as f:
             pickle.dump(word_mapping,f)
