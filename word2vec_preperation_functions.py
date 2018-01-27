@@ -148,11 +148,12 @@ def map_subreddits_pool(all_subs):
     '''
     maps every subreddit using the sublist and the mapping passed in
     '''
+    num_cores = multiprocessing.cpu_count()
     datapoints = []
     labels = []
     print("Beginning to label and transform subreddits")
     t1 = time.time()
-    pool = multiprocessing.Pool(4)
+    pool = multiprocessing.Pool(num_cores)
     results = pool.map(map_one_sub,all_subs)
     #turning these into numpy arrays
     t2 = time.time()
@@ -185,6 +186,7 @@ def prepare_for_word2vec(db, number_of_words,map_done = True):
     on after training word2vec
     '''
     # of words to include in vocabulary for the word2vec implementation
+    number_cores = multiprocessing.cpu_count()
     all_subs = db.posts.distinct('subreddit')
     global word_mapping
     all_subs = all_subs[:8]
@@ -193,7 +195,7 @@ def prepare_for_word2vec(db, number_of_words,map_done = True):
         N_subs = len(all_subs)
         p_counters = {}
         #counting all the words in the corpus
-        pool = multiprocessing.Pool(4)
+        pool = multiprocessing.Pool(number_cores)
         results = pool.map(count_one_sub,all_subs)
         final_counter = Counter()
         for r in results:
@@ -208,8 +210,6 @@ def prepare_for_word2vec(db, number_of_words,map_done = True):
     if map_done:
         with open('wordmapping.pkl','rb') as f:
             word_mapping = pickle.load(f)
-    if word_mapping:
-        print("it exists")
     data = map_subreddits_pool(all_subs)
     datapoints, labels = label_datapoints(data)
     return datapoints, labels, word_mapping

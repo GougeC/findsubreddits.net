@@ -9,6 +9,8 @@ from nltk import word_tokenize
 import tensorflow as tf
 import time
 import random
+from multiprocessing import Pool
+import multiprocessing
 from keras.preprocessing.sequence import pad_sequences,make_sampling_table,skipgrams
 from keras.layers import Embedding, Dense, Reshape, merge
 from keras.models import Model
@@ -25,18 +27,26 @@ def get_features_from_num(num,reverse_dictionary,feature_mat):
         return feature_mat[num,:]
     else:
         return feature_mat[0,:]
-def make_input_datapoints(datapoints,labels,vocab_size):
-    input_datapoints = []
-    for data in datapoints:
-        sampling_table = make_sampling_table(vocab_size)
-        couples, labels = skipgrams(data, vocab_size, window_size=3, sampling_table=sampling_table)
-        word_target, word_context = zip(*couples)
-        word_target = np.array(word_target,dtype = "int32")
-        word_context = np.array(word_context,dtype = "int32")
-        input_datapoints.append({'word_target':word_target,
-                                'word_context':word_context,
-                                'labels': labels})
+def make_input_datapoints_multi(datapoints,sub_labels,vocab_size):
+    number_cores = multiprocessing.cpu_count()
+    data_labels = zip(datapoints,sub_labels)
+    global sampling_table
+    sampling_table = sampling_table = make_sampling_table(vocab_size+1)
+    proc_pool = Pool(number_cores)
+    input_datapoints = proc_pool.map(create_input_point,data_labels)
     return input_datapoints
+
+def create_input_point(point):
+    global sampling_table
+    datapoint , sub = point
+    couples,labels = skipgrams(datapoint,vocab_size, window_size=3, sampling_table=sampling_table)
+    word_target, word_context = zip(*couples)
+    word_target = np.array(word_target,dtype = "int32")
+    word_context = np.array(word_context,dtype = "int32")
+    input_datapoint = {'word_target':word_target,
+                            'word_context':word_context,
+                            'labels': labels}
+    return input_datapoint
 
 if __name__ == '__main__':
     client = pymongo.MongoClient('mongodb://ec2-54-214-228-72.us-west-2.compute.amazonaws.com:27017/')
@@ -47,7 +57,10 @@ if __name__ == '__main__':
     datapoints, sub_labels, word_mapping = w2vp.prepare_for_word2vec(db,vocab_size,True)
     validating = False
     reverse_dictionary = dict(zip(word_mapping.values(), word_mapping.keys()))
-    vocab_size = len(word_mapping)+1
+    word_mapping['NONCE'] = vocab_size
+    reverse_dictionary[vocab_size] = 'NONCE'
+
+    vocab_size = len(word_mapping)
     window_size = 3
     vector_dimension = 300
     epochs = 1000
@@ -63,16 +76,24 @@ if __name__ == '__main__':
 
 
     num_samples = len(datapoints)
+    print(len(datapoints),"number datapoints")
+    print(datapoints[0])
+    print(len(datapoints[0]),"number inside one datapoint")
     max_length = 100
-    print(list(word_mapping.keys())[-1])
-    word_mapping['NONCE'] = vocab_size
-    reverse_dictionary[vocab_size] = 'NONCE'
+    print(vocab_size,"vocab size")
+    print(list(word_mapping.keys())[-1], "last key in the wordmap")
     datapoints = pad_sequences(datapoints, maxlen = max_length, dtype = 'int32',
                                      padding = 'post', truncating = 'post', value = vocab_size)
-    print(len(datapoints))
+    print(len(datapoints),"number of datapoints")
     print(datapoints[0].shape)
     # making skipgram training pairs to train the word embedding
-    input_datapoints = make_input_datapoints(datapoints,sub_labels,vocab_size)
+    t1 = time.time()
+    input_datapoints = make_input_datapoints_multi(datapoints,sub_labels,vocab_size)
+    t2 = time.time()
+    print("input data took {} minutes".format((t2-t1)/60))
+    print("making input data worked!")
+    with open('input_datapoints.pkl','wb') as f:
+        pickle.dump(input_datapoints,f)
     #creating the wordembedding network
     input_target = keras.Input((1,))
     input_context = keras.Input((1,))
@@ -126,7 +147,7 @@ if __name__ == '__main__':
     for i in range(loops+1):
         for s in range(num_samples):
             sample = input_datapoints[s]
-            idx = np.random.randint(0,len(sample['lables']))
+            idx = np.random.randint(0,len(sample['labels']))
             w_target[0,] = sample['word_target'][idx]
             w_context[0,] = sample['word_context'][idx]
             lbls[0,] = sample['labels'][idx]
