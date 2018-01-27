@@ -142,9 +142,9 @@ if __name__ == '__main__':
     w_target = np.zeros((1,))
     w_context = np.zeros((1,))
     lbls = np.zeros((1,))
-    loops = epochs//num_samples
+    loops = 1000
     cnt = 0
-    for i in range(loops+1):
+    for i in range(loops):
         for s in range(num_samples):
             sample = input_datapoints[s]
             idx = np.random.randint(0,len(sample['labels']))
