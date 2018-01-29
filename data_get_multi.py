@@ -13,6 +13,13 @@ import get_reddit_user_data as grud
 import pymongo
 
 
+def connect_to_mongo():
+    with open('keys/mongoconnect.txt') as f:
+        s = f.read()
+    s = s[:-1]
+    client = pymongo.MongoClient(s)
+    db = client.get_database('redditdb')
+    return db
 
 def do_list_of_subs(subreddit_list,keys,date,user_list):
     '''
@@ -24,10 +31,9 @@ def do_list_of_subs(subreddit_list,keys,date,user_list):
                          client_id = keys[0] ,
                          user_agent = 'datagathering by /u/GougeC')
     #start connection to mongodb database
-    client = pymongo.MongoClient('mongodb://ec2-54-214-228-72.us-west-2.compute.amazonaws.com:27017/')
     #loop over each sub assigned to this process
     for sub_name in subreddit_list:
-        get_write_sub_data(sub_name,date,reddit,user_list,client)
+        get_write_sub_data(sub_name,date,reddit,user_list)
 
 def get_subreddits():
     '''
@@ -63,12 +69,13 @@ def get_post_info(post,user_list,subreddit):
     post_dict['id'] = post.id
     post_dict['permalink'] = post.permalink
     post_dict['subreddit'] = subreddit
-    if post.author.name:
-        post_dict['author'] = post.author.name
-        with open(user_list,'a') as f:
-            f.write(post.author.name)
-            f.write(',\n')
-            f.flush()
+    if post.author:
+        if post.author.name:
+            post_dict['author'] = post.author.name
+            with open(user_list,'a') as f:
+                f.write(post.author.name)
+                f.write(',\n')
+                f.flush()
 
     post_dict['selftext'] = post.selftext
     post_dict['domain'] = post.domain
@@ -77,30 +84,21 @@ def get_post_info(post,user_list,subreddit):
     while len(comment_list) < 1000:
         if not post.comments:
             break
-        try:
-            post.comments.replace_more()
-        except:
-            print('failed comments replace_more')
-            continue
-        try:
-            for comment in post.comments:
-                if comment.body:
-                    comment_list.append(comment.body)
-                if comment.author:
-                    with open(user_list,'a+') as g:
-                        g.write(comment.author.name+',\n')
-                        g.flush()
-                try:
-                    if comment.replies:
-                        reps = get_10_children(comment,user_list)
-                        comment_list+=reps
-                except Exception as e:
-                    print('trying to get children broke',str(e))
-
-                if len(comment_list) >= 1000: break
-        except:
-            print('trying to get comments broke')
-            break
+        post.comments.replace_more()
+        for comment in post.comments:
+            if comment.body:
+                comment_list.append(comment.body)
+            if comment.author:
+                with open(user_list,'a+') as g:
+                    g.write(comment.author.name+',\n')
+                    g.flush()
+            try:
+                if comment.replies:
+                    reps = get_10_children(comment,user_list)
+                    comment_list+=reps
+            except Exception as e:
+                print('trying to get children broke',str(e))
+            if len(comment_list) >= 1000: break
     post_dict['comments'] = comment_list
     return post_dict
 
@@ -113,10 +111,7 @@ def get_10_children(comment,user_list):
     i = 0
     #check if the replies exist
     if comment.replies:
-        try:
-            comment.replies.replace_more()
-        except:
-            print('comment replace more failed')
+        comment.replies.replace_more()
         i = 0
         #get data from up to ten replies
         for reply in comment.replies:
@@ -132,12 +127,13 @@ def get_10_children(comment,user_list):
     return comments
 
 
-def get_write_sub_data(sub_name,date,reddit,user_list,client):
+def get_write_sub_data(sub_name,date,reddit,user_list):
     '''
     Retrives the data from the sub named in the sub_name parameter
     and writes the data as a json with the date included in the filename
     '''
     t1 = time.time()
+
     print("trying to get ",sub_name)
     #call reddit api to get the sub data
     try:
@@ -152,29 +148,22 @@ def get_write_sub_data(sub_name,date,reddit,user_list,client):
     posts = {}
     top = sub.top(time_filter = 'month')
     i = 0
+    db = connect_to_mongo()
+    posts = db.posts
     try:
 
         for post in top:
             post_dic = {}
             i+=1
             #get metadata from post plus post data from deeper function
-            try:
-                post_dic['subreddit'] = sub_name
-                post_dic['permalink'] = post.permalink
-                post_dic['data'] = get_post_info(post,user_list,sub_name)
-                #write post data to mongodb
-                try:
-                    db = client.capstone_db
-                    posts = db.posts
-                    posts.insert_one(post_dic)
-                except Exception as e:
-                    print("failed to add post to db ",sub_name, e)
-            except Exception as e:
-                print('trying get_post_info broke',sub_name, e)
-                continue
+            post_dic['subreddit'] = sub_name
+            post_dic['permalink'] = post.permalink
+            post_dic['data'] = get_post_info(post,user_list,sub_name)
+            #write post data to mongodb
+            posts.insert_one(post_dic)
 
-    except:
-        print('trying to loop through posts broke',sub_name)
+    except Exception as e:
+        print('trying to loop through posts broke',sub_name,e)
         return None
             #vestigial code for now
             ##filename = '../data'+date+'/'+sub_name+date+'.json'
