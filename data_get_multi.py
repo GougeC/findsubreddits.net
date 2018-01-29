@@ -18,7 +18,7 @@ def connect_to_mongo():
         s = f.read()
     s = s[:-1]
     client = pymongo.MongoClient(s)
-    db = client.get_database('redditdb')
+    db = client.get_database('reddit_capstone')
     return db
 
 def do_list_of_subs(subreddit_list,keys,date,user_list):
@@ -81,24 +81,24 @@ def get_post_info(post,user_list,subreddit):
     post_dict['domain'] = post.domain
     post_dict['link_url'] = post.url
     comment_list = []
-    while len(comment_list) < 1000:
-        if not post.comments:
-            break
+    if post.comments:
         post.comments.replace_more()
         for comment in post.comments:
             if comment.body:
                 comment_list.append(comment.body)
-            if comment.author:
-                with open(user_list,'a+') as g:
-                    g.write(comment.author.name+',\n')
-                    g.flush()
-            try:
-                if comment.replies:
-                    reps = get_10_children(comment,user_list)
-                    comment_list+=reps
-            except Exception as e:
-                print('trying to get children broke',str(e))
-            if len(comment_list) >= 1000: break
+            if len(comment_list) > 1000:
+                break
+            #if comment.author:
+            #    with open(user_list,'a+') as g:
+            #        g.write(comment.author.name+',\n')
+            #        g.flush()
+            #try:
+            #    if comment.replies:
+            #        reps = get_10_children(comment,user_list)
+            #        comment_list+=reps
+            #except Exception as e:
+            #    print('trying to get children broke',str(e))
+            #if len(comment_list) >= 1000: break
     post_dict['comments'] = comment_list
     return post_dict
 
