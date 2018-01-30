@@ -43,18 +43,22 @@ class Sub_Iterator():
             sub_gen = subreddit_sentences(self.db,sub)
             for s in sub_gen:
                 yield s
-
-if __name__ == '__main__':
-    db = connect_to_mongo()
-    subs = db.posts.distinct('subreddit')
+def train_word2vec(subs, size = 300,epochs = 10, min_count = 10):
     n_cores = multiprocessing.cpu_count()
     print("Training word2vec on {} subreddits".format(len(subs)))
     t1 = time.time()
     sub_iter = Sub_Iterator(subs)
-    model = gensim.models.Word2Vec(sub_iter,size = 300,window = 3, min_count = 10,workers = n_cores)
+    model = gensim.models.Word2Vec(sub_iter,size = size,window = 3, min_count = min_count,workers = n_cores)
     sub_iter = Sub_Iterator(subs)
     t_words = model.corpus_count
-    model.train(sub_iter,total_words = t_words,epochs = 10)
-    model.save("w2vmodel")
+    model.train(sub_iter,total_words = t_words,epochs = epochs)
     t2 = time.time()
     print("training completed, elapsed time: {}".format(t2 - t1))
+    return model
+
+if __name__ == '__main__':
+    db = connect_to_mongo()
+    subs = db.posts.distinct('subreddit')
+
+    model = train_word2vec(subs)
+    model.save("w2vmodel")

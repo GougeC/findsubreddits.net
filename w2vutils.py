@@ -18,7 +18,7 @@ def connect_to_mongo():
     db = client.get_database('reddit_capstone')
     return db
 
-def clean_and_tokenize(comment, filter_stopwords = False, cap_at_25 = False):
+def clean_and_tokenize(comment, filter_stopwords = False, cap_at_100 = False):
     '''
     Takes in a string of text and cleans it by removing punctuation and common symbols and then returns a
     list of word tokens
@@ -36,13 +36,13 @@ def clean_and_tokenize(comment, filter_stopwords = False, cap_at_25 = False):
         return None
     if not filter_stopwords:
         if cap_at_25:
-            return c[:25]
+            return c[:100]
         return c
     else:
         from nltk.corpus import stopwords
         stopWords = set(stopwords.words('english'))
         if cap_at_25:
-            return [word for word in c if word not in stopWords][:25]
+            return [word for word in c if word not in stopWords][:100]
         return [word for word in c if word not in stopWords]
 
 
@@ -137,3 +137,16 @@ def map_no_condense(subreddit,mapping):
     data = get_process_comments(subreddit,filter_stopwords=True)
     mapped = [map_to_nums(x,mapping) for x in data]
     return mapped
+
+def get_sub_raw(subname):
+    '''
+    gets just the raw text comments and titles from a sub
+    '''
+    db = connect_to_mongo()
+    sub_data = db.posts.find({'subreddit':subname},{'data':1})
+    points = []
+    for post in sub_data:
+        for comment in post['data']['comments']:
+            points.append(comment)
+        points.append(post['data']['title'])
+    return points
