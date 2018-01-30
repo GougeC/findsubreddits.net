@@ -117,11 +117,6 @@ def get_10_children(comment,user_list):
         for reply in comment.replies:
             i+=1
             if i==10: break
-            if reply.author:
-                with open(user_list,'a+') as h:
-                    h.write(reply.author.name)
-                    h.write(',\n')
-                    h.flush()
             if reply.body:
                 comments.append(reply.body)
     return comments
@@ -209,34 +204,34 @@ if __name__ == "__main__":
         p.join()
     print('Processes Finished for subreddit data')
 
-    #read user data that was deposited earlier by each process
-    users1 = pd.read_csv(directory+'users_list'+date+str(1)+'.txt',header=None)[0]
-    users2 = pd.read_csv(directory+'users_list'+date+str(2)+'.txt',header=None)[0]
-    users3 = pd.read_csv(directory+'users_list'+date+str(3)+'.txt',header=None)[0]
-    users4 = pd.read_csv(directory+'users_list'+date+str(4)+'.txt',header=None)[0]
-    bagousers = set()
-
-    #get a set of the unique users
-    for lst in [users1,users2,users3,users4]:
-        uniq = lst.unique()
-        for user in uniq:
-            bagousers.add(user)
-    users_unique = list(bagousers)
-
-    #split the user set into 4, for each process
-    k = len(users_unique)//4
-    lists = [users_unique[:k],users_unique[k:2*k],users_unique[2*k,3*k],users_unique[3*k:]]
-
-    #assign each process its work and its api keys
-    for i in range(1,5):
-        keys = np.loadtxt('keys/reddit{}.txt'.format(i),dtype=str,delimiter=',')
-        filename = '../data'+date+'/'+'USER_DATA_'+str(i)+'.json'
-        p = Process(target=grud.get_data_for_userlist, args = (lists[i-1],keys,filename,client))
-        processes.append(p)
-
-    #start and finish each process
-    for p in processes:
-        p.start()
-    for p in processes:
-        p.join()
-    print('Processes Finished for User Data')
+    # #read user data that was deposited earlier by each process
+    # users1 = pd.read_csv(directory+'users_list'+date+str(1)+'.txt',header=None)[0]
+    # users2 = pd.read_csv(directory+'users_list'+date+str(2)+'.txt',header=None)[0]
+    # users3 = pd.read_csv(directory+'users_list'+date+str(3)+'.txt',header=None)[0]
+    # users4 = pd.read_csv(directory+'users_list'+date+str(4)+'.txt',header=None)[0]
+    # bagousers = set()
+    #
+    # #get a set of the unique users
+    # for lst in [users1,users2,users3,users4]:
+    #     uniq = lst.unique()
+    #     for user in uniq:
+    #         bagousers.add(user)
+    # users_unique = list(bagousers)
+    #
+    # #split the user set into 4, for each process
+    # k = len(users_unique)//4
+    # lists = [users_unique[:k],users_unique[k:2*k],users_unique[2*k,3*k],users_unique[3*k:]]
+    #
+    # #assign each process its work and its api keys
+    # for i in range(1,5):
+    #     keys = np.loadtxt('keys/reddit{}.txt'.format(i),dtype=str,delimiter=',')
+    #     filename = '../data'+date+'/'+'USER_DATA_'+str(i)+'.json'
+    #     p = Process(target=grud.get_data_for_userlist, args = (lists[i-1],keys,filename,client))
+    #     processes.append(p)
+    #
+    # #start and finish each process
+    # for p in processes:
+    #     p.start()
+    # for p in processes:
+    #     p.join()
+    # print('Processes Finished for User Data')
