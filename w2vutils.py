@@ -18,22 +18,31 @@ def connect_to_mongo():
     db = client.get_database('reddit_capstone')
     return db
 
-def clean_and_tokenize(comment, filter_stopwords = False):
+def clean_and_tokenize(comment, filter_stopwords = False, cap_at_25 = False):
     '''
     Takes in a string of text and cleans it by removing punctuation and common symbols and then returns a
     list of word tokens
     '''
-
-    c = re.sub('['+string.punctuation+']', '',comment)
-    c = c.replace('@','')
-    c = c.replace('#','')
-    c = c.replace('\n','')
-    c = nltk.word_tokenize(c.lower())
+    if type(comment)==str:
+        try:
+            c = re.sub('['+string.punctuation+']', '',comment)
+        except:
+            c = comment
+        c = c.replace('@','')
+        c = c.replace('#','')
+        c = c.replace('\n','')
+        c = nltk.word_tokenize(c.lower())
+    else:
+        return None
     if not filter_stopwords:
+        if cap_at_25:
+            return c[:25]
         return c
     else:
         from nltk.corpus import stopwords
         stopWords = set(stopwords.words('english'))
+        if cap_at_25:
+            return [word for word in c if word not in stopWords][:25]
         return [word for word in c if word not in stopWords]
 
 
