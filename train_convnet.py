@@ -145,7 +145,10 @@ def create_confusion_matrix(y_true,predictions,sub_mapping):
 if __name__ =='__main__':
     t1 = time.time()
     #get data for x and y from the given sub_list
+    db = w2vutils.connect_to_mongo()
+    sub_list = db.posts.distinct('subreddit')
     print("getting data from db")
+
     X,y,sub_dict = create_x_y(sub_list)
 
     #create word index and training/validation data
@@ -180,10 +183,8 @@ if __name__ =='__main__':
     confusion_matrix = make_confusion_matrix(y_val,preds,sub_indexs)
     #print(confusion_matrix)
     t1 = time.time()
-    db = w2vutils.connect_to_mongo()
-    sub_list = db.posts.distinct('subreddit')
-    print("getting data from db")
     #get data for x and y from the given sub_list
+    print("getting data from the db")
     X,y,sub_dict = create_x_y(sub_list)
 
     #create word index and training/validation data
@@ -218,7 +219,7 @@ if __name__ =='__main__':
     confusion_matrix = make_confusion_matrix(y_val,preds2,sub_indexs)
     #print(confusion_matrix)
 
-    
+
     print("trying to pickle models")
     import pickle
     with open('gensim_model.pkl','wb') as f:
