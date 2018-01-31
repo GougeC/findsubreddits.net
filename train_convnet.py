@@ -165,13 +165,13 @@ if __name__ =='__main__':
     embedding_dict = create_embedding_dict(sub_list,
                                            size = 300,
                                            epochs = 15,
-                                          use_GloVe = False)
+                                          use_GloVe = True)
 
     #creates keras model for training
     print("creating model")
     model = create_model(word_index = word_index,
                           embedding_dict= embedding_dict,
-                          EMBEDDING_DIM= 100,
+                          EMBEDDING_DIM= 300,
                           MAX_SEQUENCE_LENGTH = 100,
                          NUM_CLASSES = len(y_train[0]))
 
@@ -207,7 +207,7 @@ if __name__ =='__main__':
     print("creating model")
     model2 = create_model(word_index = word_index,
                           embedding_dict= embedding_dict,
-                          EMBEDDING_DIM= 100,
+                          EMBEDDING_DIM= 300,
                           MAX_SEQUENCE_LENGTH = 100,
                          NUM_CLASSES = len(y_train[0]))
 
