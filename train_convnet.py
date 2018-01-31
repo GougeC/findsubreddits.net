@@ -53,7 +53,7 @@ def create_word_index_train_val(X,y,MAX_WORDS,MAX_SEQUENCE_LENGTH):
     word_index = tokenizer.word_index
     data = pad_sequences(sequences = s, maxlen = MAX_SEQUENCE_LENGTH)
     labels = to_categorical(np.array(y))
-    X_train, X_val, y_train,y_val = train_test_split(data,labels,test_size=0.1, random_state=42)
+    X_train, X_val, y_train,y_val = train_test_split(data,labels,test_size=0.1, random_state=42, stratify = labels)
     return word_index, X_train,X_val,y_train,y_val
 
 def create_embedding_matrix(word_index,embedding_dict,EMBEDDING_DIM):
@@ -108,7 +108,7 @@ def create_model(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NUM
     x = GlobalMaxPooling1D()(x)
 
     x = Dense(128, activation='relu')(x)
-    output = Dense(NUMBER_OF_CLASSES, activation='softmax')(x)
+    output = Dense(NUM_CLASSES, activation='softmax')(x)
 
     model = Model(input_sequence,output)
     model.compile(loss='categorical_crossentropy',
