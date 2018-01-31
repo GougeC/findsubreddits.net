@@ -53,7 +53,10 @@ def create_word_index_train_val(X,y,MAX_WORDS,MAX_SEQUENCE_LENGTH):
     word_index = tokenizer.word_index
     data = pad_sequences(sequences = s, maxlen = MAX_SEQUENCE_LENGTH)
     labels = to_categorical(np.array(y))
-    X_train, X_val, y_train,y_val = train_test_split(data,labels,test_size=0.1, random_state=42, stratify = labels)
+    inds = np.random.shuffle(np.arange(len(data)))
+    test_inds = inds[:10000]
+    train_inds = inds[10000:]
+    X_train, X_val, y_train,y_val = data[train_inds],data[test_inds],labels[train_inds],labels[test_inds]
     return word_index, X_train,X_val,y_train,y_val
 
 def create_embedding_matrix(word_index,embedding_dict,EMBEDDING_DIM):
