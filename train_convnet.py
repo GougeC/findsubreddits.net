@@ -60,8 +60,8 @@ def create_word_index_train_val(X,y,MAX_WORDS,MAX_SEQUENCE_LENGTH):
     labels = to_categorical(np.array(y))
     inds = np.arange(len(data))
     np.random.shuffle(inds)
-    test_inds = inds[:10000]
-    train_inds = inds[10000:]
+    test_inds = inds[:100000]
+    train_inds = inds[100000:]
     X_train, X_val, y_train,y_val = data[train_inds],data[test_inds],labels[train_inds],labels[test_inds]
     return word_index, X_train,X_val,y_train,y_val
 
@@ -181,6 +181,8 @@ if __name__ =='__main__':
                           MAX_SEQUENCE_LENGTH = 100,
                          NUM_CLASSES = len(y_train[0]))
 
+    t2 = time.time()
+    print("prepping to fit model took: {} minutes".format((t2-t1)/60))
     #fitting model
     model.fit(X_train,y_train,batch_size=100,epochs = 10,validation_data=(X_val,y_val))
 
