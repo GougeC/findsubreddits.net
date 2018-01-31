@@ -146,22 +146,25 @@ if __name__ =='__main__':
     t1 = time.time()
     db = w2vutils.connect_to_mongo()
     sub_list = db.posts.distinct('subreddit')
-
+    print("getting data from db")
     #get data for x and y from the given sub_list
     X,y,sub_dict = create_x_y(sub_list)
 
     #create word index and training/validation data
+    print("creating word index")
     word_index, X_train,X_val,y_train,y_val = create_word_index_train_val(X,y,
                                                                           MAX_SEQUENCE_LENGTH = 100,
                                                                           MAX_WORDS=10000)
     #gets embedding dict trains one if not use_GloVe
     #note glove always returns 300 len embedding atm
+    print("creating embedding dict")
     embedding_dict = create_embedding_dict(sub_list,
                                            size = 300,
                                            epochs = 15,
                                           use_GloVe = False)
 
     #creates keras model for training
+    print("creating model")
     model2 = create_model(word_index = word_index,
                           embedding_dict= embedding_dict,
                           EMBEDDING_DIM= 100,
@@ -181,20 +184,24 @@ if __name__ =='__main__':
 
     t1 = time.time()
     #get data for x and y from the given sub_list
+    print("getting data from db")
     X,y,sub_dict = create_x_y(sub_list)
 
     #create word index and training/validation data
+    print("creating word index")
     word_index, X_train,X_val,y_train,y_val = create_word_index_train_val(X,y,
                                                                           MAX_SEQUENCE_LENGTH = 100,
                                                                           MAX_WORDS=10000)
     #gets embedding dict trains one if not use_GloVe
     #note glove always returns 300 len embedding atm
+    print("creating embedding dict")
     embedding_dict = create_embedding_dict(sub_list,
                                            size = 300,
                                            epochs = 15,
                                           use_GloVe = False)
 
     #creates keras model for training
+    print("creating model")
     model = create_model(word_index = word_index,
                           embedding_dict= embedding_dict,
                           EMBEDDING_DIM= 100,
