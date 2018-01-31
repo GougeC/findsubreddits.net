@@ -8,7 +8,7 @@ from keras.models import Model, Sequential
 from keras import Input
 from keras.utils import to_categorical
 import w2vutils
-
+import pickle
 import train_word2vec
 
 from sklearn.model_selection import train_test_split
@@ -184,8 +184,18 @@ if __name__ =='__main__':
 
     print("Time to train network with GloVe embeddings: {} minutes".format((t2-t1)/60))
     #evaluate model
+
     preds = model.predict_on_batch(X_val)
     confusion_matrix = make_confusion_matrix(y_val,preds,sub_indexs)
+
+    with open('glove_model.pkl','wb') as f:
+        pickle.dump(model,f)
+    with open('glove_word_index.pkl','wb') as f:
+        pickle.dump(word_index,f)
+    with open('glove_confusion_matrix.pkl','wb') as f:
+        pickle.dump(confusion_matrix,f)
+
+
     #print(confusion_matrix)
     t1 = time.time()
     #get data for x and y from the given sub_list
@@ -226,8 +236,5 @@ if __name__ =='__main__':
 
 
     print("trying to pickle models")
-    import pickle
     with open('gensim_model.pkl','wb') as f:
         pickle.dump(model2,f)
-    with open('glove_model.pkl','wb') as f:
-        pickle.dump(model,f)
