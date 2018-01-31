@@ -100,14 +100,14 @@ def create_model(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NUM
     embedding_layer = create_embedding_layer(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH)
     input_sequence = Input(shape = (MAX_SEQUENCE_LENGTH,),dtype = 'int32')
     embedded_sequences = embedding_layer(input_sequence)
-    x = Conv1D(32, 3, activation='relu',name = "cv1")(embedded_sequences)
+    x = Conv1D(128, 3, activation='relu',name = "cv1")(embedded_sequences)
     x = MaxPooling1D(5)(x)
-    x = Conv1D(32, 3, activation='relu',name = "cv2")(x)
+    x = Conv1D(128, 3, activation='relu',name = "cv2")(x)
     x = MaxPooling1D(5)(x)
-    x = Conv1D(32, 3, activation='relu',name = "cv3")(x)
+    x = Conv1D(128, 3, activation='relu',name = "cv3")(x)
     x = GlobalMaxPooling1D()(x)
 
-    x = Dense(32, activation='relu')(x)
+    x = Dense(128, activation='relu')(x)
     output = Dense(NUMBER_OF_CLASSES, activation='softmax')(x)
 
     model = Model(input_sequence,output)
