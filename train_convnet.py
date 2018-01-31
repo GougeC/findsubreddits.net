@@ -47,11 +47,13 @@ def create_word_index_train_val(X,y,MAX_WORDS,MAX_SEQUENCE_LENGTH):
                      lower = True,
                      split = " ",
                      char_level = False)
+    print("fitting tokenizer")
     tokenizer.fit_on_texts(X)
     s = tokenizer.texts_to_sequences(X)
-
+    print("padding sequences")
     word_index = tokenizer.word_index
     data = pad_sequences(sequences = s, maxlen = MAX_SEQUENCE_LENGTH)
+    print("processing data and splitting into train_test")
     labels = to_categorical(np.array(y))
     inds = np.random.shuffle(np.arange(len(data)))
     test_inds = inds[:10000]
