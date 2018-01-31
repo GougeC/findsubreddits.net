@@ -144,6 +144,42 @@ def create_confusion_matrix(y_true,predictions,sub_mapping):
 
 if __name__ =='__main__':
     t1 = time.time()
+    #get data for x and y from the given sub_list
+    print("getting data from db")
+    X,y,sub_dict = create_x_y(sub_list)
+
+    #create word index and training/validation data
+    print("creating word index")
+    word_index, X_train,X_val,y_train,y_val = create_word_index_train_val(X,y,
+                                                                          MAX_SEQUENCE_LENGTH = 100,
+                                                                          MAX_WORDS=10000)
+    #gets embedding dict trains one if not use_GloVe
+    #note glove always returns 300 len embedding atm
+    print("creating embedding dict")
+    embedding_dict = create_embedding_dict(sub_list,
+                                           size = 300,
+                                           epochs = 15,
+                                          use_GloVe = False)
+
+    #creates keras model for training
+    print("creating model")
+    model = create_model(word_index = word_index,
+                          embedding_dict= embedding_dict,
+                          EMBEDDING_DIM= 100,
+                          MAX_SEQUENCE_LENGTH = 100,
+                         NUM_CLASSES = len(y_train[0]))
+
+    #fitting model
+    model.fit(X_train,y_train,batch_size=100,epochs = 10,validation_data=(X_val,y_val))
+
+    t2 = time.time()
+
+    print("Time to train network with GloVe embeddings: {} minutes".format((t2-t1)/60))
+    #evaluate model
+    preds = model.predict_on_batch(X_val)
+    confusion_matrix = make_confusion_matrix(y_val,preds,sub_indexs)
+    #print(confusion_matrix)
+    t1 = time.time()
     db = w2vutils.connect_to_mongo()
     sub_list = db.posts.distinct('subreddit')
     print("getting data from db")
@@ -182,42 +218,7 @@ if __name__ =='__main__':
     confusion_matrix = make_confusion_matrix(y_val,preds2,sub_indexs)
     #print(confusion_matrix)
 
-    t1 = time.time()
-    #get data for x and y from the given sub_list
-    print("getting data from db")
-    X,y,sub_dict = create_x_y(sub_list)
-
-    #create word index and training/validation data
-    print("creating word index")
-    word_index, X_train,X_val,y_train,y_val = create_word_index_train_val(X,y,
-                                                                          MAX_SEQUENCE_LENGTH = 100,
-                                                                          MAX_WORDS=10000)
-    #gets embedding dict trains one if not use_GloVe
-    #note glove always returns 300 len embedding atm
-    print("creating embedding dict")
-    embedding_dict = create_embedding_dict(sub_list,
-                                           size = 300,
-                                           epochs = 15,
-                                          use_GloVe = False)
-
-    #creates keras model for training
-    print("creating model")
-    model = create_model(word_index = word_index,
-                          embedding_dict= embedding_dict,
-                          EMBEDDING_DIM= 100,
-                          MAX_SEQUENCE_LENGTH = 100,
-                         NUM_CLASSES = len(y_train[0]))
-
-    #fitting model
-    model.fit(X_train,y_train,batch_size=100,epochs = 10,validation_data=(X_val,y_val))
-
-    t2 = time.time()
-
-    print("Time to train network with GloVe embeddings: {} minutes".format((t2-t1)/60))
-    #evaluate model
-    preds = model.predict_on_batch(X_val)
-    confusion_matrix = make_confusion_matrix(y_val,preds,sub_indexs)
-    #print(confusion_matrix)
+    
     print("trying to pickle models")
     import pickle
     with open('gensim_model.pkl','wb') as f:
