@@ -169,7 +169,7 @@ if __name__ =='__main__':
                           embedding_dict= embedding_dict,
                           EMBEDDING_DIM= 100,
                           MAX_SEQUENCE_LENGTH = 100,
-                         NUM_CLASSES = len(y_train))
+                         NUM_CLASSES = len(y_train[0]))
 
     #fitting model
     model2.fit(X_train,y_train,batch_size=100,epochs = 10,validation_data=(X_val,y_val))
@@ -206,7 +206,7 @@ if __name__ =='__main__':
                           embedding_dict= embedding_dict,
                           EMBEDDING_DIM= 100,
                           MAX_SEQUENCE_LENGTH = 100,
-                         NUM_CLASSES = len(y_train))
+                         NUM_CLASSES = len(y_train[0]))
 
     #fitting model
     model.fit(X_train,y_train,batch_size=100,epochs = 10,validation_data=(X_val,y_val))
