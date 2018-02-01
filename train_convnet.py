@@ -161,6 +161,12 @@ if __name__ =='__main__':
     X,y,sub_dict = create_x_y(sub_list)
     with open('kerasmodel_sub_mapping.pkl','wb') as f:
         pickle.dump(sub_dict,f)
+    with open('subreddit_class_weights.pkl','rb') as f:
+        sub_weights = pickle.load(f)
+    sub_to_ind = {v: k for k, v in sub_dict.items()}
+    class_weights = {}
+    for sub,weight in sub_weights.items():
+        class_weights[sub_to_ind[sub]] = weight
     #create word index and training/validation data
     print("creating word index")
     word_index, X_train,X_val,y_train,y_val = create_word_index_train_val(X,y,
@@ -185,7 +191,7 @@ if __name__ =='__main__':
     t2 = time.time()
     print("prepping to fit model took: {} minutes".format((t2-t1)/60))
     #fitting model
-    model.fit(X_train,y_train,batch_size=100,epochs = 3,validation_data=(X_val,y_val))
+    model.fit(X_train,y_train,batch_size=100,epochs = 3,validation_data=(X_val,y_val),class_weight = class_weights)
 
     t2 = time.time()
 
@@ -209,6 +215,11 @@ if __name__ =='__main__':
     #get data for x and y from the given sub_list
     print("getting data from the db")
     X,y,sub_dict = create_x_y(sub_list)
+    sub_to_ind = {v: k for k, v in sub_dict.items()}
+    class_weights = {}
+    for sub,weight in sub_weights.items():
+        class_weights[sub_to_ind[sub]] = weight
+
 
     #create word index and training/validation data
     print("creating word index")
@@ -232,7 +243,7 @@ if __name__ =='__main__':
                          NUM_CLASSES = len(y_train[0]))
 
     #fitting model
-    model2.fit(X_train,y_train,batch_size=1000,epochs = 3,validation_data=(X_val,y_val))
+    model2.fit(X_train,y_train,batch_size=1000,epochs = 3,validation_data=(X_val,y_val),class_weight = class_weights)
 
     t2 = time.time()
 
