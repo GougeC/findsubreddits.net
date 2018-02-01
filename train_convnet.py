@@ -245,3 +245,5 @@ if __name__ =='__main__':
     print("trying to pickle models")
     with open('gensim_model.pkl','wb') as f:
         pickle.dump(model2,f)
+    with open('gensimwordindex.pkl','wb') as f:
+        pickle.dump(word_index,f)
