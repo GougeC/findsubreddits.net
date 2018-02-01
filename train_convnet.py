@@ -184,7 +184,7 @@ if __name__ =='__main__':
     t2 = time.time()
     print("prepping to fit model took: {} minutes".format((t2-t1)/60))
     #fitting model
-    model.fit(X_train,y_train,batch_size=100,epochs = 5,validation_data=(X_val,y_val))
+    model.fit(X_train,y_train,batch_size=100,epochs = 3,validation_data=(X_val,y_val))
 
     t2 = time.time()
 
@@ -192,9 +192,7 @@ if __name__ =='__main__':
     #evaluate model
 
 
-
-    with open('glove_model.pkl','wb') as f:
-        pickle.dump(model,f)
+    model.save('glovemodel.HDF5')
     with open('glove_word_index.pkl','wb') as f:
         pickle.dump(word_index,f)
     preds = model.predict_on_batch(X_val)
@@ -231,7 +229,7 @@ if __name__ =='__main__':
                          NUM_CLASSES = len(y_train[0]))
 
     #fitting model
-    model2.fit(X_train,y_train,batch_size=1000,epochs = 6,validation_data=(X_val,y_val))
+    model2.fit(X_train,y_train,batch_size=1000,epochs = 3,validation_data=(X_val,y_val))
 
     t2 = time.time()
 
@@ -243,7 +241,6 @@ if __name__ =='__main__':
 
 
     print("trying to pickle models")
-    with open('gensim_model.pkl','wb') as f:
-        pickle.dump(model2,f)
+    model2.save('model2.HDF5')
     with open('gensimwordindex.pkl','wb') as f:
         pickle.dump(word_index,f)
