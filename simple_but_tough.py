@@ -40,7 +40,7 @@ class Frequency_Map:
             return 0.0
     def update_with_counter(self,counter):
         self.counts += counter
-        self.total_words += sum(counter.values)
+        self.total_words += sum(counter.values())
 
     def return_only_ones(self):
         #this will make the counter return 1 for everything
