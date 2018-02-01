@@ -231,7 +231,7 @@ if __name__ =='__main__':
                          NUM_CLASSES = len(y_train[0]))
 
     #fitting model
-    model2.fit(X_train,y_train,batch_size=100,epochs = 6,validation_data=(X_val,y_val))
+    model2.fit(X_train,y_train,batch_size=1000,epochs = 6,validation_data=(X_val,y_val))
 
     t2 = time.time()
 
