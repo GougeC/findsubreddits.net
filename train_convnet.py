@@ -11,6 +11,7 @@ import w2vutils
 import pickle
 import train_word2vec
 
+from keras import optimizers
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import f1_score,roc_auc_score
 
@@ -118,10 +119,10 @@ def create_model(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NUM
 
     x = Dense(128, activation='relu')(x)
     output = Dense(NUM_CLASSES, activation='softmax')(x)
-
+    adop = optimizers.Adam(lr=0.005, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.000001, amsgrad=False)
     model = Model(input_sequence,output)
     model.compile(loss='categorical_crossentropy',
-                  optimizer='rmsprop',
+                  optimizer=adop,
                   metrics=['acc'])
     return model
 
@@ -191,7 +192,7 @@ if __name__ =='__main__':
     t2 = time.time()
     print("prepping to fit model took: {} minutes".format((t2-t1)/60))
     #fitting model
-    model.fit(X_train,y_train,batch_size=100,epochs = 3,validation_data=(X_val,y_val),class_weight = class_weights)
+    model.fit(X_train,y_train,batch_size=10000,epochs = 5,validation_data=(X_val,y_val),class_weight = class_weights)
 
     t2 = time.time()
 
@@ -243,7 +244,7 @@ if __name__ =='__main__':
                          NUM_CLASSES = len(y_train[0]))
 
     #fitting model
-    model2.fit(X_train,y_train,batch_size=1000,epochs = 3,validation_data=(X_val,y_val),class_weight = class_weights)
+    model2.fit(X_train,y_train,batch_size=10000,epochs = 3,validation_data=(X_val,y_val),class_weight = class_weights)
 
     t2 = time.time()
 
