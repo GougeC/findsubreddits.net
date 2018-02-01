@@ -184,20 +184,21 @@ if __name__ =='__main__':
     t2 = time.time()
     print("prepping to fit model took: {} minutes".format((t2-t1)/60))
     #fitting model
-    model.fit(X_train,y_train,batch_size=100,epochs = 10,validation_data=(X_val,y_val))
+    model.fit(X_train,y_train,batch_size=100,epochs = 5,validation_data=(X_val,y_val))
 
     t2 = time.time()
 
     print("Time to train network with GloVe embeddings: {} minutes".format((t2-t1)/60))
     #evaluate model
 
-    preds = model.predict_on_batch(X_val)
-    confusion_matrix = make_confusion_matrix(y_val,preds,sub_indexs)
+
 
     with open('glove_model.pkl','wb') as f:
         pickle.dump(model,f)
     with open('glove_word_index.pkl','wb') as f:
         pickle.dump(word_index,f)
+    preds = model.predict_on_batch(X_val)
+    confusion_matrix = create_confusion_matrix(y_val,preds,sub_indexs)
     with open('glove_confusion_matrix.pkl','wb') as f:
         pickle.dump(confusion_matrix,f)
 
@@ -230,14 +231,14 @@ if __name__ =='__main__':
                          NUM_CLASSES = len(y_train[0]))
 
     #fitting model
-    model2.fit(X_train,y_train,batch_size=100,epochs = 10,validation_data=(X_val,y_val))
+    model2.fit(X_train,y_train,batch_size=100,epochs = 6,validation_data=(X_val,y_val))
 
     t2 = time.time()
 
     print("Time to train word2vec and network: {} minutes".format((t2-t1)/60))
     #evaluate model
     preds2 = model2.predict_on_batch(X_val)
-    confusion_matrix = make_confusion_matrix(y_val,preds2,sub_indexs)
+    confusion_matrix = create_confusion_matrix(y_val,preds2,sub_indexs)
     #print(confusion_matrix)
 
 

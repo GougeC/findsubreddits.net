@@ -35,13 +35,13 @@ def clean_and_tokenize(comment, filter_stopwords = False, cap_at_100 = False):
     else:
         return None
     if not filter_stopwords:
-        if cap_at_25:
+        if cap_at_100:
             return c[:100]
         return c
     else:
         from nltk.corpus import stopwords
         stopWords = set(stopwords.words('english'))
-        if cap_at_25:
+        if cap_at_100:
             return [word for word in c if word not in stopWords][:100]
         return [word for word in c if word not in stopWords]
 
