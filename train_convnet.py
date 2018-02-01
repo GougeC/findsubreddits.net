@@ -159,7 +159,8 @@ if __name__ =='__main__':
     print("getting data from db")
 
     X,y,sub_dict = create_x_y(sub_list)
-
+    with open('kerasmodel_sub_mapping.pkl','wb') as f:
+        pickle.dump(sub_dict,f)
     #create word index and training/validation data
     print("creating word index")
     word_index, X_train,X_val,y_train,y_val = create_word_index_train_val(X,y,
@@ -196,10 +197,12 @@ if __name__ =='__main__':
     with open('glove_word_index.pkl','wb') as f:
         pickle.dump(word_index,f)
     preds = model.predict_on_batch(X_val)
-    confusion_matrix = create_confusion_matrix(y_val,preds,sub_indexs)
-    with open('glove_confusion_matrix.pkl','wb') as f:
-        pickle.dump(confusion_matrix,f)
-
+    try:
+        confusion_matrix = create_confusion_matrix(y_val,preds,sub_dict)
+        with open('glove_confusion_matrix.pkl','wb') as f:
+            pickle.dump(confusion_matrix,f)
+    except:
+        print('conf matrix broke')
 
     #print(confusion_matrix)
     t1 = time.time()
@@ -235,8 +238,8 @@ if __name__ =='__main__':
 
     print("Time to train word2vec and network: {} minutes".format((t2-t1)/60))
     #evaluate model
-    preds2 = model2.predict_on_batch(X_val)
-    confusion_matrix = create_confusion_matrix(y_val,preds2,sub_indexs)
+    #preds2 = model2.predict_on_batch(X_val)
+    #confusion_matrix = create_confusion_matrix(y_val,preds2,sub_indexs)
     #print(confusion_matrix)
 
 
