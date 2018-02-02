@@ -20,7 +20,7 @@ from keras.models import Model, Sequential
 from keras import Input
 from keras.utils import to_categorical
 
-
+## This class
 class CNN_reddit_recommender():
     def __init__(self,model_path,sub_map_path,word_ind_path):
         """
@@ -47,7 +47,8 @@ class CNN_reddit_recommender():
         if as_link:
             return as_urls(recs)
         return recs
-    def predict_on_twitter(self,twitter_handle,num_pred):
+
+    def predict_on_twitter(self,twitter_handle,num_pred = 5):
         """
         gets prediction with data from a twitter handle
         """
@@ -69,7 +70,9 @@ class CNN_reddit_recommender():
         padded_sequence = pad_sequences(mapped_sequences,100)
         return padded_sequence
 
-
+## This was the first draft recommender I built which is based on
+## an implementation of the following paper: https://openreview.net/pdf?id=SyK00v5xx
+## It is slower and has more variance in recommendations than the subsequent CNN models
 class SBT_Recommender():
 
     def __init__(self, corpus_count_path, sub_info_path):
