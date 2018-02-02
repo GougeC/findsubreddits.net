@@ -119,10 +119,10 @@ def create_model(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NUM
 
     x = Dense(128, activation='relu')(x)
     output = Dense(NUM_CLASSES, activation='softmax')(x)
-    adop = optimizers.Adam(lr=0.005, beta_1=0.9, beta_2=0.999, epsilon=None, decay=0.000001, amsgrad=False)
+    rmsop = optimizers.RMSprop(lr=0.005, rho=0.9, epsilon=None, decay=0.000001)
     model = Model(input_sequence,output)
     model.compile(loss='categorical_crossentropy',
-                  optimizer=adop,
+                  optimizer=rmsop,
                   metrics=['acc'])
     return model
 
