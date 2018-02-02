@@ -9,7 +9,6 @@ import os
 import datetime
 import requests
 from bs4 import BeautifulSoup
-import get_reddit_user_data as grud
 import pymongo
 
 

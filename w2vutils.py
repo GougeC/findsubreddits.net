@@ -7,6 +7,9 @@ import re
 import gensim
 import time
 
+##This is a bunch of helper functions for the Reddit2vec project
+
+
 def connect_to_mongo():
     '''
     Connects to a mongodb client using pymongo and connects to the 'reddit_capstone' db

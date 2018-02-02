@@ -7,6 +7,7 @@ from w2vutils import clean_and_tokenize, process_embeddings
 ## this code is an adapted version of https://github.com/peter3125/sentence2vec/blob/master/sentence2vec.py
 ## by peter3125 on github (Peter de Vocht)
 ## this is an implementation of the following paper: https://openreview.net/pdf?id=SyK00v5xx
+
 #object for a word with associated vector
 class Word:
     def __init__(self, text, vector):
@@ -20,7 +21,12 @@ class Sentence:
     # return the length of a sentence
     def len(self):
         return len(self.word_list)
+
 class Frequency_Map:
+    """
+    This class is essentially a counter but it returns the frequency relative to the total word count instead of a count.
+    It can also be set to always return 0 for ease of coding in the sentence_to_vec function
+    """
     ## this assumes the corpus is a list of of strings
     def __init__(self):
         self.counts = Counter()
@@ -47,6 +53,9 @@ class Frequency_Map:
         self.disabled = True
 
 def prep_text_for_stv(comments):
+    '''
+    Prepares text as objects for the sentence_to_vec function
+    '''
     mapping = process_embeddings('embeddings/glove.6B.100d.txt')
     ##this assumes all the text is in a list of strings, and in the interest of my project
     ## this defines a "sentence" as an entire comment
@@ -68,6 +77,10 @@ def prep_text_for_stv(comments):
 # Sanjeev Arora, Yingyu Liang, Tengyu Ma
 # Princeton University
 def sentence_to_vec(comments,frequencies,embedding_size = 100, a =1e-3,use_frequencies = True):
+    """
+    This sums the word embedding vectors in a sentence (or the block of tokens specified as a sentence) and then subtracts the first principal component
+    of the sentence vector to create a vector that can be used for cosine similarities between sentences
+    """
     sentence_list = prep_text_for_stv(comments)
     if not use_frequencies:
         frequencies.return_only_ones()
