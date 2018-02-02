@@ -216,10 +216,13 @@ if __name__ =='__main__':
     #get data for x and y from the given sub_list
     print("getting data from the db")
     X,y,sub_dict = create_x_y(sub_list)
+
     sub_to_ind = {v: k for k, v in sub_dict.items()}
     class_weights = {}
     for sub,weight in sub_weights.items():
         class_weights[sub_to_ind[sub]] = weight
+    with open('sub_mapping2.pkl','wb') as f:
+        pickle.dump(sub_dict,f)
 
 
     #create word index and training/validation data
@@ -244,7 +247,7 @@ if __name__ =='__main__':
                          NUM_CLASSES = len(y_train[0]))
 
     #fitting model
-    model2.fit(X_train,y_train,batch_size=10000,epochs = 3,validation_data=(X_val,y_val),class_weight = class_weights)
+    model2.fit(X_train,y_train,batch_size=10000,epochs = 5,validation_data=(X_val,y_val),class_weight = class_weights)
 
     t2 = time.time()
 
@@ -257,5 +260,5 @@ if __name__ =='__main__':
 
     print("trying to pickle models")
     model2.save('model2.HDF5')
-    with open('gensimwordindex.pkl','wb') as f:
+    with open('model2_word_index.pkl','wb') as f:
         pickle.dump(word_index,f)
