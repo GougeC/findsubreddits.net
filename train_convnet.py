@@ -111,9 +111,9 @@ def create_model(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NUM
     input_sequence = Input(shape = (MAX_SEQUENCE_LENGTH,),dtype = 'int32')
     embedded_sequences = embedding_layer(input_sequence)
     x = Conv1D(128, 3, activation='relu',name = "cv1")(embedded_sequences)
-    x = MaxPooling1D(5)(x)
+    x = MaxPooling1D(3)(x)
     x = Conv1D(128, 3, activation='relu',name = "cv2")(x)
-    x = MaxPooling1D(5)(x)
+    x = MaxPooling1D(3)(x)
     x = Conv1D(128, 3, activation='relu',name = "cv3")(x)
     x = GlobalMaxPooling1D()(x)
 
@@ -125,6 +125,28 @@ def create_model(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NUM
                   optimizer=rmsop,
                   metrics=['acc'])
     return model
+
+def create_model2(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NUM_CLASSES):
+
+    embedding_layer = create_embedding_layer(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH)
+    input_sequence = Input(shape = (MAX_SEQUENCE_LENGTH,),dtype = 'int32')
+    embedded_sequences = embedding_layer(input_sequence)
+    x = Conv1D(128, 5, activation='relu',name = "cv1")(embedded_sequences)
+    x = MaxPooling1D(5)(x)
+    x = Conv1D(128, 5, activation='relu',name = "cv2")(x)
+    x = MaxPooling1D(5)(x)
+    x = Conv1D(128, 5, activation='relu',name = "cv3")(x)
+    x = GlobalMaxPooling1D()(x)
+
+    x = Dense(128, activation='relu')(x)
+    output = Dense(NUM_CLASSES, activation='softmax')(x)
+    rmsop = optimizers.RMSprop(lr=0.005, rho=0.9, epsilon=None, decay=0.000001)
+    model = Model(input_sequence,output)
+    model.compile(loss='categorical_crossentropy',
+                  optimizer=rmsop,
+                  metrics=['acc'])
+    return model
+
 
 def create_confusion_matrix(y_true,predictions,sub_mapping):
     '''
@@ -160,7 +182,7 @@ if __name__ =='__main__':
     print("getting data from db")
 
     X,y,sub_dict = create_x_y(sub_list)
-    with open('kerasmodel_sub_mapping.pkl','wb') as f:
+    with open('kerasmodel_sub_mapping1.pkl','wb') as f:
         pickle.dump(sub_dict,f)
     with open('subreddit_class_weights.pkl','rb') as f:
         sub_weights = pickle.load(f)
@@ -200,8 +222,8 @@ if __name__ =='__main__':
     #evaluate model
 
 
-    model.save('glovemodel.HDF5')
-    with open('glove_word_index.pkl','wb') as f:
+    model.save('glovemodel1.HDF5')
+    with open('glove_word_index1.pkl','wb') as f:
         pickle.dump(word_index,f)
     preds = model.predict_on_batch(X_val)
     try:
@@ -236,11 +258,11 @@ if __name__ =='__main__':
     embedding_dict = create_embedding_dict(sub_list,
                                            size = 300,
                                            epochs = 15,
-                                          use_GloVe = False)
+                                          use_GloVe = True)
 
     #creates keras model for training
     print("creating model")
-    model2 = create_model(word_index = word_index,
+    model2 = create_model2(word_index = word_index,
                           embedding_dict= embedding_dict,
                           EMBEDDING_DIM= 300,
                           MAX_SEQUENCE_LENGTH = 100,
@@ -256,6 +278,8 @@ if __name__ =='__main__':
     #preds2 = model2.predict_on_batch(X_val)
     #confusion_matrix = create_confusion_matrix(y_val,preds2,sub_indexs)
     #print(confusion_matrix)
+    with open('kerasmodel_sub_mapping2.pkl','wb') as f:
+        pickle.dump(sub_dict,f)
 
 
     print("trying to pickle models")
