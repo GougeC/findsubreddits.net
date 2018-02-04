@@ -208,7 +208,7 @@ if __name__ =='__main__':
     t2 = time.time()
     print("prepping to fit model took: {} minutes".format((t2-t1)/60))
     #fitting model
-    model.fit(X_train,y_train,batch_size=5000,epochs = 6,validation_data=(X_val,y_val),class_weight = class_weights)
+    model.fit(X_train,y_train,batch_size=5000,epochs = 3,validation_data=(X_val,y_val),class_weight = class_weights)
 
     t2 = time.time()
 
@@ -263,7 +263,7 @@ if __name__ =='__main__':
                          NUM_CLASSES = len(y_train[0]))
 
     #fitting model
-    model2.fit(X_train,y_train,batch_size=10000,epochs = 5,validation_data=(X_val,y_val),class_weight = class_weights)
+    model2.fit(X_train,y_train,batch_size=10000,epochs = 3,validation_data=(X_val,y_val),class_weight = class_weights)
 
     t2 = time.time()
 
