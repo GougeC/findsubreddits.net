@@ -48,6 +48,22 @@ class CNN_reddit_recommender():
             return as_urls(recs)
         return recs
 
+    def predict_on_list_handles(self,handle_list,num_pred = 5):
+        '''
+        takes in a python list of twitter handles and gets num_pred predictions for the last 25 tweets
+        of each of the accouts (puts all of the text together and makes a recommendation)
+        '''
+        handle_list = handle_list.split(',')
+        handle_list = [a.strip() for a in handle_list]
+        data = []
+        for handle in handle_list:
+            if handle[0] == '@':
+                data.extend(get_tweets(handle[1:],25))
+            else:
+                data.extend(get_tweets(handle,25))
+        texts = '\n'.join(data)
+
+        return self.predict_on_text(texts,num_pred)
     def predict_on_twitter(self,twitter_handle,num_pred = 5):
         """
         gets prediction with data from a twitter handle
@@ -174,5 +190,5 @@ def as_urls(subs):
     '''
     converts sub names to links to the actual subreddits
     '''
-    results = ['https://www.reddit.com/r/'+a+'/' for a in subs]
+    results = ['r/'+a for a in subs]
     return results

@@ -1,0 +1,114 @@
+<!--A Design by W3layouts
+Author: W3layout
+Author URL: http://w3layouts.com
+License: Creative Commons Attribution 3.0 Unported
+License URL: http://creativecommons.org/licenses/by/3.0/
+-->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<title>Subreddit Recommender</title>
+
+<!-- Meta tag Keywords -->
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="keywords" content="Shopping Sign in Form template Responsive, Login form web template,Flat Pricing tables,Flat Drop downs Sign up Web Templates,
+ Flat Web Templates, Login sign up Responsive web template, SmartPhone Compatible web template, free web designs for Nokia, Samsung, LG, SonyEricsson, Motorola web design">
+ <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+
+<script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false);
+
+function hideURLbar(){ window.scrollTo(0,1); } </script>
+<!-- Meta tag Keywords -->
+<script type="text/javascript">
+   function make_Text_Recs() {
+       text = getText()
+       $.ajax({
+           url: "/text",
+           contentType: "application/json",
+           type: "POST",
+           success: showRecs,
+           data: JSON.stringify({'text':text,'handles':[]})
+       });
+   }
+   function make_Twitter_Recs() {
+       twitters = getTwitters()
+       $.ajax({
+           url: "/twitter",
+           contentType: "application/json",
+           type: "POST",
+           success: showRecs,
+           data: JSON.stringify({'handles':twitters,'text':[]})
+       });
+   }
+
+    function getTwitters(){
+            return $("#twitterBox").val()
+       }
+    function getText(){
+            return $("#textBox").val()
+           }
+
+   function showRecs(rec_ids) {
+       recs_html="<div>"
+       rec_ids.forEach(function(sub) {
+            recs_html += '<a href="https://www.reddit.com/'
+            recs_html += url
+            recs_html += '">'
+            recs_html += url
+            recs_html += '</a>'
+       })
+       recs_html += "</div>"
+       recsDiv = $("div#subreddits")
+       recsDiv.html(recs_html)
+   }
+</script>
+<!-- css files -->
+<link href="../static/css/style.css" rel="stylesheet" type="text/css" media="all" />
+<!-- css files -->
+<link rel="../static/css/stylesheet" href="css/font-awesome.css"> <!-- Font-Awesome-Icons-CSS -->
+
+
+<!-- Online-fonts -->
+<link href="//fonts.googleapis.com/css?family=Varela+Round&amp;subset=hebrew,latin-ext,vietnamese" rel="stylesheet">
+<!-- //Online-fonts -->
+
+</head>
+<body>
+	<!-- main -->
+    <div class = "bigbox">
+	<div class="main">
+		<div class="main-w3l">
+			<h1 class="logo-w3">Subreddit Recommender</h1>
+			<div class="w3layouts-left">
+				<h2>Find content similar to Twitter accounts:</h2>
+				<!--<div class="icon">
+					<span class="fa fa-thumbs-o-up" aria-hidden="true"></span>
+				</div>-->
+                    <textarea id="twitterBox" placeholder="Paste some text here to find subreddits that are similar"
+                    rows="10" cols="35"></textarea>
+                    <button id="submit-button" onclick="make_Twitter_Recs()"> Make Recommendations </button>
+
+			</div>
+			<div class="w3layouts-main">
+				<h2>Find content similar to some text:</h2>
+                        <textarea id="textBox" placeholder="Paste some text here to find subreddits that are similar"
+                        rows="10" cols="35"></textarea>
+                        <button id="submit-button2" onclick="make_Text_Recs()"> Make Recommendations </button>
+			</div>
+			<div class="clear"></div>
+			<!-- //main -->
+            <div class="subreddits" id="subreddits">
+				<p>  Some Recommendations can go here </p>
+			</div>
+
+			<!--footer-->
+			<div class="footer-w3l">
+				<p>&copy;  Connor Gouge | github.com/GougeC | Design by W3layouts</p>
+			</div>
+			<!--//footer-->
+		</div>
+	</div>
+    </div>
+</body>
+</html>
