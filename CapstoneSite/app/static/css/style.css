@@ -61,6 +61,7 @@ h1,h2,h3,h4,h5,h6{
 h2{
     color: #fff;
     font-size: 28px;
+    margin-bottom: 30px;
 }
 a {
     color: #FFFFFF;
@@ -134,10 +135,10 @@ h1.logo-w3  {
     margin: 10px 0;
 }
 .w3layouts-main{
-	padding: 48px 35px;
+	padding: 40px 40px;
 }
 .w3layouts-left{
-	padding: 55.5px 35px;
+	padding: 40px 40px;
 }
 .w3layouts-left li {
     margin: 1em 0;
@@ -294,11 +295,17 @@ input[type="submit"]:hover {
 }
 /*--//placeholder-color--*/
 /*-- //main --*/
+.subreddits {
+    background:rgba(0, 0, 0, 0.7);
+	font-weight: 600;
+	font-family: 'Varela Round', sans-serif;
+    max-width: 90%;
+}
+
 
 /*--footer--*/
-.footer-w3l a {
+.subreddits {
     background: ;
-	font-weight: 600;
 	font-family: 'Varela Round', sans-serif;
 }
 .footer-w3l p {
@@ -309,7 +316,6 @@ input[type="submit"]:hover {
     letter-spacing: 2px;
 }
 .footer-w3l a {
-    color:#000;
 	font-weight: 600;
 	font-family: 'Varela Round', sans-serif;
 }
@@ -424,9 +430,6 @@ input[type="submit"]:hover {
 	.w3layouts-main h2, .w3layouts-main2 h3 {
 		font-size: 25px;
 	}
-	.w3layouts-left {
-		padding: 42.5px 35px;
-	}
 	input[type="text"], input[type="email"], input[type="password"] {
 		width: 68%;
 	}
@@ -496,7 +499,7 @@ input[type="submit"]:hover {
 		word-spacing: 10px;
 	}
 	.w3layouts-main, .w3layouts-left {
-		width: 38%;
+		width: 40%;
 	}
 	.w3layouts-main h2, .w3layouts-main2 h3 {
 		font-size: 23px;
@@ -509,7 +512,7 @@ input[type="submit"]:hover {
 	.w3layouts-main h2, .w3layouts-main2 h3 {
 		font-size: 22px;
 	}
-	.w3layouts-left {
+	.w3layouts-left, .w3layouts-main {
 		padding: 41px 35px;
 	}
 }
@@ -539,8 +542,6 @@ input[type="submit"]:hover {
 	.w3layouts-main h2, .w3layouts-main2 h3 {
 		font-size: 21px;
 	}
-	.w3layouts-left {
-		padding: 34px 30px;
 	}
 	input[type="text"], input[type="email"], input[type="password"] {
 		width: 65%;
@@ -567,7 +568,7 @@ input[type="submit"]:hover {
 		width: 98%;
 		left: 2%;
 	}
-	.w3layouts-left {
+	.w3layouts-left,.w3layouts-main {
 		padding: 34px 25px;
 		width:38%;
 	}
@@ -596,20 +597,11 @@ input[type="submit"]:hover {
 	}
 }
 @media(max-width: 600px){
-	.w3layouts-main {
+	.w3layouts-main,.w3layouts-left {
 		width: 70%;
 		float: none;
 		padding: 34px 30px;
 		margin: 0 auto;
-	}
-	input[type="text"], input[type="email"], input[type="password"] {
-		width: 72%;
-	}
-	.w3layouts-left {
-		padding: 34px 30px;
-		width: 70%;
-		float: none;
-		margin: 0 auto 1em;
 	}
 	.main-w3l {
 		width: 88%;

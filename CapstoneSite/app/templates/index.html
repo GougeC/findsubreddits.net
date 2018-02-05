@@ -53,10 +53,11 @@ function hideURLbar(){ window.scrollTo(0,1); } </script>
        recs_html="<div>"
        rec_ids.forEach(function(sub) {
             recs_html += '<a href="https://www.reddit.com/'
-            recs_html += url
+            recs_html += sub
             recs_html += '">'
-            recs_html += url
+            recs_html += sub
             recs_html += '</a>'
+            recs_html += '<br>'
        })
        recs_html += "</div>"
        recsDiv = $("div#subreddits")
@@ -87,24 +88,27 @@ function hideURLbar(){ window.scrollTo(0,1); } </script>
 				</div>-->
                     <textarea id="twitterBox" placeholder="Paste some text here to find subreddits that are similar"
                     rows="10" cols="35"></textarea>
+                    <br>
                     <button id="submit-button" onclick="make_Twitter_Recs()"> Make Recommendations </button>
-
+                    <p> Enter handles as a comma seperated list</p>
 			</div>
 			<div class="w3layouts-main">
 				<h2>Find content similar to some text:</h2>
                         <textarea id="textBox" placeholder="Paste some text here to find subreddits that are similar"
                         rows="10" cols="35"></textarea>
+                        <br>
                         <button id="submit-button2" onclick="make_Text_Recs()"> Make Recommendations </button>
+                        <p>For best results seperate paragraphs by lines</p>
 			</div>
 			<div class="clear"></div>
 			<!-- //main -->
             <div class="subreddits" id="subreddits">
-				<p>  Some Recommendations can go here </p>
+
 			</div>
 
 			<!--footer-->
 			<div class="footer-w3l">
-				<p>&copy;  Connor Gouge | github.com/GougeC | Design by W3layouts</p>
+				<p>&copy;  Connor Gouge | <a href="https://github.com/GougeC/dsi_capstone">Github</a> | Design by W3layouts</p>
 			</div>
 			<!--//footer-->
 		</div>
