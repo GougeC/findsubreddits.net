@@ -106,13 +106,14 @@ def create_embedding_dict(sublist,size,epochs,use_GloVe = False):
 
 
 def create_model(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NUM_CLASSES):
-
+    print("2 conv layers no max pooling")
     embedding_layer = create_embedding_layer(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH)
     input_sequence = Input(shape = (MAX_SEQUENCE_LENGTH,),dtype = 'int32')
     embedded_sequences = embedding_layer(input_sequence)
+
     x = Conv1D(128, 5, activation='relu',name = "cv1")(embedded_sequences)
-    x = MaxPooling1D(5)(x)
-    x = GlobalMaxPooling1D()(x)
+    x = Conv1D(128, 5, activation='relu',name = "cv2")(x)
+    x = Flatten()(x)
     x = Dense(1024, activation='relu')(x)
     output = Dense(NUM_CLASSES, activation='softmax')(x)
     rmsop = optimizers.RMSprop(lr=0.005, rho=0.9, epsilon=None, decay=0.000001)
@@ -123,15 +124,30 @@ def create_model(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NUM
     return model
 
 def create_model2(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NUM_CLASSES):
-
+    print("two convolutional layers max pooling 3 inbetween")
+    embedding_layer = create_embedding_layer(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH)
+    input_sequence = Input(shape = (MAX_SEQUENCE_LENGTH,),dtype = 'int32')
+    embedded_sequences = embedding_layer(input_sequence)
+    x = Conv1D(128, 5, activation='relu',name = "cv1")(embedded_sequences)
+    x = MaxPooling1D(3)(x)
+    x = Conv1D(128, 5, activation='relu',name = "cv2")(x)
+    x = Flatten()(x)
+    x = Dense(1024, activation='relu')(x)
+    output = Dense(NUM_CLASSES, activation='softmax')(x)
+    rmsop = optimizers.RMSprop(lr=0.005, rho=0.9, epsilon=None, decay=0.000001)
+    model = Model(input_sequence,output)
+    model.compile(loss='categorical_crossentropy',
+                  optimizer=rmsop,
+                  metrics=['acc'])
+    return model
+def create_modelcurrent(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NUM_CLASSES):
+    print("one conv layer with global max pooling")
     embedding_layer = create_embedding_layer(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH)
     input_sequence = Input(shape = (MAX_SEQUENCE_LENGTH,),dtype = 'int32')
     embedded_sequences = embedding_layer(input_sequence)
     x = Conv1D(128, 5, activation='relu',name = "cv1")(embedded_sequences)
     x = MaxPooling1D(5)(x)
-    x = Conv1D(128, 5, activation='relu',name = "cv2")(x)
     x = GlobalMaxPooling1D()(x)
-
     x = Dense(1024, activation='relu')(x)
     output = Dense(NUM_CLASSES, activation='softmax')(x)
     rmsop = optimizers.RMSprop(lr=0.005, rho=0.9, epsilon=None, decay=0.000001)
@@ -169,6 +185,10 @@ def create_confusion_matrix(y_true,predictions,sub_mapping):
 
 
 if __name__ =='__main__':
+    import datetime
+    now = datetime.datetime.now()
+    test_num = 1
+    datestr = str(test_num)+'_'+str(now.month) +'_' + str(now.day)
     t1 = time.time()
     #get data for x and y from the given sub_list
     db = w2vutils.connect_to_mongo()
@@ -176,7 +196,7 @@ if __name__ =='__main__':
     print("getting data from db")
 
     X,y,sub_dict = create_x_y(sub_list)
-    with open('1Convbigdensedict.pkl','wb') as f:
+    with open(datestr+'m_1_dict.pkl','wb') as f:
         pickle.dump(sub_dict,f)
     with open('subreddit_class_weights.pkl','rb') as f:
         sub_weights = pickle.load(f)
@@ -216,43 +236,14 @@ if __name__ =='__main__':
     #evaluate model
 
 
-    model.save('1Convbigdense.HDF5')
-    with open('1Convbigdenseindex1.pkl','wb') as f:
+    model.save(datestr+'m_1_model.HDF5')
+    with open(datestr+'m_1_index.pkl','wb') as f:
         pickle.dump(word_index,f)
-    preds = model.predict_on_batch(X_val)
-    try:
-        confusion_matrix = create_confusion_matrix(y_val,preds,sub_dict)
-        with open('glove_confusion_matrix.pkl','wb') as f:
-            pickle.dump(confusion_matrix,f)
-    except:
-        print('conf matrix broke')
 
     #print(confusion_matrix)
     t1 = time.time()
     #get data for x and y from the given sub_list
-    print("getting data from the db")
-    X,y,sub_dict = create_x_y(sub_list)
 
-    sub_to_ind = {v: k for k, v in sub_dict.items()}
-    class_weights = {}
-    for sub,weight in sub_weights.items():
-        class_weights[sub_to_ind[sub]] = weight
-    with open('sub_mapping2.pkl','wb') as f:
-        pickle.dump(sub_dict,f)
-
-
-    #create word index and training/validation data
-    print("creating word index")
-    word_index, X_train,X_val,y_train,y_val = create_word_index_train_val(X,y,
-                                                                          MAX_SEQUENCE_LENGTH = 100,
-                                                                          MAX_WORDS=10000)
-    #gets embedding dict trains one if not use_GloVe
-    #note glove always returns 300 len embedding atm
-    print("creating embedding dict")
-    embedding_dict = create_embedding_dict(sub_list,
-                                           size = 300,
-                                           epochs = 15,
-                                          use_GloVe = True)
 
     #creates keras model for training
     print("creating model")
@@ -267,16 +258,25 @@ if __name__ =='__main__':
 
     t2 = time.time()
 
-    print("Time to train word2vec and network: {} minutes".format((t2-t1)/60))
-    #evaluate model
-    #preds2 = model2.predict_on_batch(X_val)
-    #confusion_matrix = create_confusion_matrix(y_val,preds2,sub_indexs)
-    #print(confusion_matrix)
-    with open('2convmodel.pkl','wb') as f:
+    print("Time to train model2: {} minutes".format((t2-t1)/60))
+    with open(datestr+'m_2_subdict.pkl','wb') as f:
         pickle.dump(sub_dict,f)
-
-
     print("trying to pickle models")
-    model2.save('2convmodel.HDF5')
-    with open('2convmodelindex.pkl','wb') as f:
+    model2.save(datestr+'m_2_model.HDF5')
+    with open(datestr+'m_2_index.pkl','wb') as f:
+        pickle.dump(word_index,f)
+
+    modelcurrent = create_modelcurrent(word_index = word_index,
+                          embedding_dict= embedding_dict,
+                          EMBEDDING_DIM= 300,
+                          MAX_SEQUENCE_LENGTH = 100,
+                         NUM_CLASSES = len(y_train[0]))
+
+    #fitting model
+    modelcurrent.fit(X_train,y_train,batch_size=5000,epochs = 4,validation_data=(X_val,y_val),class_weight = class_weights)
+    with open(datestr+'m_3_subdict.pkl','wb') as f:
+        pickle.dump(sub_dict,f)
+    print("trying to pickle models")
+    model2.save(datestr+'m_3_model.HDF5')
+    with open(datestr+'m_3_index.pkl','wb') as f:
         pickle.dump(word_index,f)
