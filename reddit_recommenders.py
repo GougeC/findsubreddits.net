@@ -55,6 +55,7 @@ class CNN_reddit_recommender():
         '''
         handle_list = handle_list.split(',')
         handle_list = [a.strip() for a in handle_list]
+        handle_list = [a for a in handle_list if a != '']
         data = []
         for handle in handle_list:
             if handle[0] == '@':
