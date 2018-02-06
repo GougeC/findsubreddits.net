@@ -59,9 +59,13 @@ class CNN_reddit_recommender():
         data = []
         for handle in handle_list:
             if handle[0] == '@':
-                data.extend(get_tweets(handle[1:],25))
+                t = get_tweets(handle[1:],25)
+                print(t)
+                data.extend(t)
             else:
-                data.extend(get_tweets(handle,25))
+                t = get_tweets(handle,25)
+                print(t)
+                data.extend(t)
         texts = '\n'.join(data)
 
         return self.predict_on_text(texts,num_pred)
