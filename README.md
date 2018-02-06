@@ -45,10 +45,7 @@ The current model for the recommender is a convolutional neural network with one
     ..- https://github.com/tensorflow/models/blob/master/tutorials/embedding/word2vec.py
     ..- https://github.com/keras-team/keras/blob/master/examples/pretrained_word_embeddings.py
 
-![](images/aws_logo.png)
-![](images/flasklogo.png)
-![](images/jupyter.png)
-![](images/numpy-logo.jpg)
-![](images/Mongo.png)
-![](images/sklearn.png)
-![](images/pandas_logo.png)
+![](images/aws_logo.png =100x100 )![](images/flasklogo.png =100x100 )
+![](images/jupyter.png =100x100 )![](images/numpy-logo.jpg =100x100  )
+![](images/Mongo.png =100x100  )![](images/sklearn.png =100x100 )
+![](images/pandas_logo.png =100x100 )
