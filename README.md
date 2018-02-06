@@ -31,27 +31,21 @@ The current model for the recommender is a convolutional neural network with one
 
 
 #### Libraries  and Technologies Used
-..* Tweepy
-    ..-Twitter API wrapper for python
-..* pymongo
-..* PRAW
-    ..-reddit API wrapper for python
-..* Gensim
-..* Beautiful Soup
-..* GloVe word embeddings
-    ..- https://nlp.stanford.edu/projects/glove/
-..* The following articles and repositories:
-    ..- https://github.com/adventuresinML/adventures-in-ml-code
-    ..- https://github.com/tensorflow/models/blob/master/tutorials/embedding/word2vec.py
-    ..- https://github.com/keras-team/keras/blob/master/examples/pretrained_word_embeddings.py
+* Tweepy
+    * Twitter API wrapper for python
+* pymongo
+* PRAW
+    * reddit API wrapper for python
+* Gensim
+* Beautiful Soup
+* GloVe word embeddings
+    * https://nlp.stanford.edu/projects/glove/
+* The following articles and repositories:
+    * https://github.com/adventuresinML/adventures-in-ml-code
+    * https://github.com/tensorflow/models/blob/master/tutorials/embedding/word2vec.py
+    * https://github.com/keras-team/keras/blob/master/examples/pretrained_word_embeddings.py
 
-<img src="images/aws_logo.png" width: "200" height="200"/>
-<img src="images/flasklogo.png" width: "200" height="200"/>
-<br>
-<img src="images/jupyter.png" width: "200" height="200"/>
-<img src="images/numpy-logo.jpg" width: "200" height="200"/>
-<br>
-<img src="images/Mongo.png" width: "200" height="200"/>
-<img src="images/sklearn.png" width: "200" height="200"/>
-<br>
-<img src="images/pandas_logo.png" width: "200" height="200"/>
+![](/images/aws_logo.png =100x100) ![](/images/flasklogo.png =100x100)
+![](/images/jupyter.png =100x100) ![](/images/numpy-logo.jpg =100x100)
+![](/images/Mongo.png =100x100) ![](/images/sklearn.png =100x100)
+![](/images/pandas_logo.png =100x100)YYYYY
