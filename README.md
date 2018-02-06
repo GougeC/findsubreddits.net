@@ -5,6 +5,8 @@
 ## Project Goals:
 The goal of this project is to give recommendations on reddit content (in the form of subreddits to follow) based on the kind of content a user already enjoys. In this project that will take the form of a web page where a user will input their Twitter handle and receive recommendations for subreddits to follow based on that data. Additionally a user will be able to provide the text of some content they enjoy and find which subreddits it best belongs in. While the scope of this project is limited to reddit I feel that the approach I have taken here could be extended to any text based content aggregator or social network.
 
+The recommender system built in this project has been implemented at [www.findsubreddits.com](www.findsubreddits.com)
+
 
 ## Methods:
 I began by getting data from the 100 top posts(or as many as there were) of around 600 popular subreddits. This data came in the form of titles, text from within text posts and comments. After pulling data from the reddit API I had around 3 million reddit commnents, titles and posts from which to draw text data from.
@@ -19,4 +21,34 @@ After mapping each word to an embedding vector I used these to train a convoluti
 
 ### Current Model:
 ![](images/modeldiagram.png)
-The current model for the recommender is a convolutional neural network with one convolutional layer of 128 size 5 filters followed by max pooling and one fully connected layer of 1024 nodes before the softmax output layer.
+
+The current model for the recommender is a convolutional neural network with one convolutional layer of 128 size 5 filters followed by max pooling and one fully connected layer of 1024 nodes before the softmax output layer. This model will likely need to be adapted as I scale the system up to a greater number of subreddits.
+
+### Future Work:
+..* Improve web interface and clean up the css
+..* Collect data on more subreddits and expand the pool for recommendations
+..* Experiment with neural net structure
+
+
+#### Libraries  and Technologies Used
+..* Tweepy
+    ..-Twitter API wrapper for python
+..* pymongo
+..* PRAW
+    ..-reddit API wrapper for python
+..* Gensim
+..* Beautiful Soup
+..* GloVe word embeddings
+    ..- https://nlp.stanford.edu/projects/glove/
+..* The following articles and repositories:
+    ..- https://github.com/adventuresinML/adventures-in-ml-code
+    ..- https://github.com/tensorflow/models/blob/master/tutorials/embedding/word2vec.py
+    ..- https://github.com/keras-team/keras/blob/master/examples/pretrained_word_embeddings.py
+
+![](images/aws_logo.png)
+![](images/flasklogo.png)
+![](images/jupyter.png)
+![](images/numpy-logo.jpg)
+![](images/Mongo.png)
+![](images/sklearn.png)
+![](images/pandas_logo.png)
