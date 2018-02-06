@@ -1,4 +1,4 @@
-# findsubreddits.net: Subreddit Recommendation
+# Reddit2Vec: Subreddit Recommendation
 
 ## Capstone project for the Galvanize Data Science Immersive program
 
@@ -25,9 +25,9 @@ After mapping each word to an embedding vector I used these to train a convoluti
 The current model for the recommender is a convolutional neural network with one convolutional layer of 128 size 5 filters followed by max pooling and one fully connected layer of 1024 nodes before the softmax output layer. This model will likely need to be adapted as I scale the system up to a greater number of subreddits.
 
 ### Future Work:
-..* Improve web interface and clean up the css
-..* Collect data on more subreddits and expand the pool for recommendations
-..* Experiment with neural net structure
+* Improve web interface and clean up the css
+* Collect data on more subreddits and expand the pool for recommendations
+* Experiment with neural net structure
 
 
 #### Libraries  and Technologies Used
@@ -45,7 +45,7 @@ The current model for the recommender is a convolutional neural network with one
     * https://github.com/tensorflow/models/blob/master/tutorials/embedding/word2vec.py
     * https://github.com/keras-team/keras/blob/master/examples/pretrained_word_embeddings.py
 
-![](/images/aws_logo.png =100x100) ![](/images/flasklogo.png =100x100)
-![](/images/jupyter.png =100x100) ![](/images/numpy-logo.jpg =100x100)
-![](/images/Mongo.png =100x100) ![](/images/sklearn.png =100x100)
-![](/images/pandas_logo.png =100x100)YYYYY
+![](/images/aws_logo.png | width=100 | height=100) ![](/images/flasklogo.png | width=100 | height=100)
+![](/images/jupyter.png | width=100 | height=100) ![](/images/numpy-logo.jpg | width=100 | height=100)
+![](/images/Mongo.png | width=100 | height=100) ![](/images/sklearn.png | width=100 | height=100)
+![](/images/pandas_logo.png | width=100 | height=100)
