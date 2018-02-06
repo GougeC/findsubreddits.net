@@ -21,11 +21,14 @@ def get_twitter_recs():
     print(request.json)
     twitter_accs = user_submission['handles']
     preds = conv1.predict_on_list_handles(twitter_accs,10)
+    print(preds)
     return jsonify(preds)
 
 @app.route('/text', methods=['POST'])
 def get_text_recs():
     user_submission = request.json
+    print(request.json)
     text= user_submission['text']
     preds = conv1.predict_on_text(text,10)
+    print(preds)
     return jsonify(preds)
