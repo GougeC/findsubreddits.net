@@ -175,9 +175,11 @@ if __name__ == "__main__":
     sublist = get_subreddits()
 
     #divide list of subs into 4 parts
-    n = len(sublist)//4
+    n = len(sublist)//8
     print('attempting to get',len(sublist), 'subreddits')
-    lists = [sublist[:n],sublist[n:2*n],sublist[2*n:3*n],sublist[3*n:]]
+    lists = []
+    for i in range(0,9)
+        lists.append(sublist[i*n:(i+1)*n])
     processes = []
     n = datetime.datetime.now()
     date = "_"+str(n.month)+"_"+str(n.day)
@@ -189,7 +191,7 @@ if __name__ == "__main__":
     open(directory+'failed_subs'+date+'.txt','w+').close()
 
     #create each process and assign it its work
-    for i in range(1,5):
+    for i in range(1,9):
         keys = np.loadtxt('keys/reddit{}.txt'.format(i),dtype=str,delimiter=',')
         user_list = directory+'users_list'+date+str(i)+'.txt'
         open(user_list,'w+').close()
