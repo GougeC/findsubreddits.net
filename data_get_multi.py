@@ -178,7 +178,7 @@ if __name__ == "__main__":
     n = len(sublist)//8
     print('attempting to get',len(sublist), 'subreddits')
     lists = []
-    for i in range(0,9)
+    for i in range(0,9):
         lists.append(sublist[i*n:(i+1)*n])
     processes = []
     n = datetime.datetime.now()
