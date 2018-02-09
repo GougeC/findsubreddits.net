@@ -36,12 +36,12 @@ def do_list_of_subs(subreddit_list,keys,date,user_list):
 
 def get_subreddits():
     '''
-    Scrapes redditlist.com for the top 625 subreddits and then
+    Scrapes redditlist.com for the top 1250 subreddits and then
     drops some of the more offensive/inappropriate subs from the list
     before returning a list of the subs
     '''
     subs = []
-    for page in range(1,6):
+    for page in range(1,11):
         req = requests.get('http://redditlist.com/?page={}'.format(page))
         soup = BeautifulSoup(req.text,'lxml')
         top = soup.find_all(class_='span4 listing')[1]
