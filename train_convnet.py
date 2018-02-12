@@ -114,7 +114,7 @@ def create_model(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NUM
     x = Conv1D(128, 5, activation='relu',name = "cv1")(embedded_sequences)
     x = Conv1D(128, 5, activation='relu',name = "cv2")(x)
     x = Flatten()(x)
-    x = Dense(1024, activation='relu')(x)
+    x = Dense(2048, activation='relu')(x)
     output = Dense(NUM_CLASSES, activation='softmax')(x)
     rmsop = optimizers.RMSprop(lr=0.005, rho=0.9, epsilon=None, decay=0.000001)
     model = Model(input_sequence,output)
@@ -132,7 +132,7 @@ def create_model2(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NU
     x = MaxPooling1D(3)(x)
     x = Conv1D(128, 5, activation='relu',name = "cv2")(x)
     x = Flatten()(x)
-    x = Dense(1024, activation='relu')(x)
+    x = Dense(2048, activation='relu')(x)
     output = Dense(NUM_CLASSES, activation='softmax')(x)
     rmsop = optimizers.RMSprop(lr=0.005, rho=0.9, epsilon=None, decay=0.000001)
     model = Model(input_sequence,output)
@@ -140,6 +140,7 @@ def create_model2(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NU
                   optimizer=rmsop,
                   metrics=['acc'])
     return model
+
 def create_modelcurrent(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NUM_CLASSES):
     print("one conv layer with global max pooling")
     embedding_layer = create_embedding_layer(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH)
@@ -148,7 +149,7 @@ def create_modelcurrent(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LEN
     x = Conv1D(128, 5, activation='relu',name = "cv1")(embedded_sequences)
     x = MaxPooling1D(5)(x)
     x = GlobalMaxPooling1D()(x)
-    x = Dense(1024, activation='relu')(x)
+    x = Dense(2048, activation='relu')(x)
     output = Dense(NUM_CLASSES, activation='softmax')(x)
     rmsop = optimizers.RMSprop(lr=0.005, rho=0.9, epsilon=None, decay=0.000001)
     model = Model(input_sequence,output)
