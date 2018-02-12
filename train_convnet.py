@@ -192,7 +192,7 @@ if __name__ =='__main__':
     t1 = time.time()
     #get data for x and y from the given sub_list
     db = w2vutils.connect_to_mongo()
-    sub_list = pd.read_csv('final_subs.csv',header=None)[0].values.tolist()
+    sub_list = pd.read_csv('sub_list.csv',header=None)[0].values.tolist()
     print("getting data from db")
 
     X,y,sub_dict = create_x_y(sub_list)
