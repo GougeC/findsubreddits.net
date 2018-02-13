@@ -106,13 +106,12 @@ def create_embedding_dict(sublist,size,epochs,use_GloVe = False):
 
 
 def create_model(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NUM_CLASSES):
-    print("2 conv layers no max pooling")
+    print("1 conv layer no max pooling")
     embedding_layer = create_embedding_layer(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH)
     input_sequence = Input(shape = (MAX_SEQUENCE_LENGTH,),dtype = 'int32')
     embedded_sequences = embedding_layer(input_sequence)
 
     x = Conv1D(128, 5, activation='relu',name = "cv1")(embedded_sequences)
-    x = Conv1D(128, 5, activation='relu',name = "cv2")(x)
     x = Flatten()(x)
     x = Dense(2048, activation='relu')(x)
     output = Dense(NUM_CLASSES, activation='softmax')(x)
