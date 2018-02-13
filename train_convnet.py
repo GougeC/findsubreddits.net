@@ -116,7 +116,7 @@ def create_model(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NUM
     x = Flatten()(x)
     x = Dense(2048, activation='relu')(x)
     output = Dense(NUM_CLASSES, activation='softmax')(x)
-    rmsop = optimizers.RMSprop(lr=0.005, rho=0.9, epsilon=None, decay=0.000001)
+    rmsop = optimizers.RMSprop(lr=0.005, rho=0.9, epsilon=None, decay=0.000002)
     model = Model(input_sequence,output)
     model.compile(loss='categorical_crossentropy',
                   optimizer=rmsop,
@@ -134,7 +134,7 @@ def create_model2(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NU
     x = Flatten()(x)
     x = Dense(2048, activation='relu')(x)
     output = Dense(NUM_CLASSES, activation='softmax')(x)
-    rmsop = optimizers.RMSprop(lr=0.005, rho=0.9, epsilon=None, decay=0.000001)
+    rmsop = optimizers.RMSprop(lr=0.005, rho=0.9, epsilon=None, decay=0.000002)
     model = Model(input_sequence,output)
     model.compile(loss='categorical_crossentropy',
                   optimizer=rmsop,
@@ -151,7 +151,7 @@ def create_modelcurrent(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LEN
     x = GlobalMaxPooling1D()(x)
     x = Dense(2048, activation='relu')(x)
     output = Dense(NUM_CLASSES, activation='softmax')(x)
-    rmsop = optimizers.RMSprop(lr=0.005, rho=0.9, epsilon=None, decay=0.000001)
+    rmsop = optimizers.RMSprop(lr=0.005, rho=0.9, epsilon=None, decay=0.000002)
     model = Model(input_sequence,output)
     model.compile(loss='categorical_crossentropy',
                   optimizer=rmsop,
@@ -188,7 +188,7 @@ def create_confusion_matrix(y_true,predictions,sub_mapping):
 if __name__ =='__main__':
     import datetime
     now = datetime.datetime.now()
-    test_num = 1
+    test_num = 2
     datestr = str(test_num)+'_'+str(now.month) +'_' + str(now.day)
     t1 = time.time()
     #get data for x and y from the given sub_list
@@ -209,7 +209,7 @@ if __name__ =='__main__':
     print("creating word index")
     word_index, X_train,X_val,y_train,y_val = create_word_index_train_val(X,y,
                                                                           MAX_SEQUENCE_LENGTH = 100,
-                                                                          MAX_WORDS=10000)
+                                                                          MAX_WORDS=20000)
     #gets embedding dict trains one if not use_GloVe
     #note glove always returns 300 len embedding atm
     print("creating embedding dict")
