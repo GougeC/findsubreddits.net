@@ -188,7 +188,7 @@ if __name__ =='__main__':
     import datetime
     now = datetime.datetime.now()
     test_num = 2
-    datestr = str(test_num)+'_'+str(now.month) +'_' + str(now.day)
+    datestr = 'models/'+str(test_num)+'_'+str(now.month) +'_' + str(now.day)
     t1 = time.time()
     #get data for x and y from the given sub_list
     db = w2vutils.connect_to_mongo()
