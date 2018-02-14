@@ -230,7 +230,7 @@ def to_multi_gpu(model,n_gpus = 2):
     return Model(input=[x], output=merged)
 
 
-def slice_batch(x,n_gpu,part):
+def slice_batch(x,n_gpus,part):
     #code from user jonilaserson on github
     '''
     helper function for multi gpu
