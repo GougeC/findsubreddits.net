@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import pymongo
-from keras.layers import Embedding,Conv1D,MaxPooling1D,Flatten,Dense,GlobalMaxPooling1D,Dropout
+from keras.layers import Embedding,Conv1D,MaxPooling1D,Flatten,Dense,GlobalMaxPooling1D,Dropout,merge
 from keras.preprocessing.text import Tokenizer,text_to_word_sequence
 from keras.preprocessing.sequence import pad_sequences
 from keras.models import Model, Sequential
@@ -10,6 +10,12 @@ from keras.utils import to_categorical
 import w2vutils
 import pickle
 import train_word2vec
+import tensorflow as tf
+from keras import backend as K
+from keras.layers.core import Lambda
+from keras.layers import Input, merge
+
+
 
 from keras import optimizers
 from sklearn.model_selection import train_test_split
@@ -206,6 +212,36 @@ def create_confusion_matrix(y_true,predictions,sub_mapping):
     print("f1 score, micro: ",f1_score(true_classes,prediction_classes,average = 'micro'))
     return con_table.T
 
+def to_multi_gpu(model,n_gpus = 2):
+    '''
+    Takes a keras model and returns a model that can be parallellized on multiple gpus
+    '''
+    #code from user jonilaserson on github
+    with tf.device('/cpu:0'):
+        x = Input(model.input_shape[1:], name=model.input_names[0])
+    towers = []
+    for g in range(n_gpus):
+        with tf.device('/gpu:' + str(g)):
+            slice_g = Lambda(slice_batch, lambda shape: shape,
+                                arguments={'n_gpus':n_gpus, 'part':g})(x)
+            towers.append(model(slice_g))
+    with tf.device('/cpu:0'):
+        merged = merge(towers, mode='concat', concat_axis=0)
+    return Model(input=[x], output=merged)
+
+
+def slice_batch(x,n_gpu,part):
+    #code from user jonilaserson on github
+    '''
+    helper function for multi gpu
+    '''
+    sh = K.shape(x)
+    L = sh[0] / n_gpus
+    if part == n_gpus - 1:
+        return x[part*L:]
+    return x[part*L:(part+1)*L]
+
+
 
 if __name__ =='__main__':
     import datetime
@@ -249,6 +285,8 @@ if __name__ =='__main__':
                          NUM_CLASSES = len(y_train[0]))
 
     t2 = time.time()
+    model = to_multi_gpu(model)
+
     print("prepping to fit model took: {} minutes".format((t2-t1)/60))
     #fitting model
     model.fit(X_train,y_train,batch_size=5000,epochs = 8,validation_data=(X_val,y_val),class_weight = class_weights)
@@ -277,6 +315,7 @@ if __name__ =='__main__':
                          NUM_CLASSES = len(y_train[0]))
 
     #fitting model
+    model2 = to_multi_gpu(model2)
     model2.fit(X_train,y_train,batch_size=5000,epochs = 8,validation_data=(X_val,y_val),class_weight = class_weights)
 
     t2 = time.time()
@@ -295,6 +334,7 @@ if __name__ =='__main__':
                          NUM_CLASSES = len(y_train[0]))
 
     #fitting model
+    model3 = to_multi_gpu(model3)
     model3.fit(X_train,y_train,batch_size=5000,epochs = 8,validation_data=(X_val,y_val),class_weight = class_weights)
 
     t2 = time.time()
@@ -313,8 +353,9 @@ if __name__ =='__main__':
                           EMBEDDING_DIM= 300,
                           MAX_SEQUENCE_LENGTH = 100,
                          NUM_CLASSES = len(y_train[0]))
-
+    modelcurrent = to_multi_gpu(modelcurrent)
     #fitting model
+
     modelcurrent.fit(X_train,y_train,batch_size=5000,epochs = 8,validation_data=(X_val,y_val),class_weight = class_weights)
     with open(datestr+'m_3_subdict.pkl','wb') as f:
         pickle.dump(sub_dict,f)
