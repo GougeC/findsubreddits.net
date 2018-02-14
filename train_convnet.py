@@ -1,7 +1,7 @@
 import numpy as np
 import pandas as pd
 import pymongo
-from keras.layers import Embedding,Conv1D,MaxPooling1D,Flatten,Dense,GlobalMaxPooling1D
+from keras.layers import Embedding,Conv1D,MaxPooling1D,Flatten,Dense,GlobalMaxPooling1D,Dropout
 from keras.preprocessing.text import Tokenizer,text_to_word_sequence
 from keras.preprocessing.sequence import pad_sequences
 from keras.models import Model, Sequential
@@ -113,6 +113,7 @@ def create_model(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NUM
 
     x = Conv1D(128, 5, activation='relu',name = "cv1")(embedded_sequences)
     x = Flatten()(x)
+    x = Dropout(.3)(x)
     x = Dense(2048, activation='relu')(x)
     output = Dense(NUM_CLASSES, activation='softmax')(x)
     rmsop = optimizers.RMSprop(lr=0.005, rho=0.9, epsilon=None, decay=0.000002)
@@ -123,12 +124,13 @@ def create_model(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NUM
     return model
 
 def create_model2(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NUM_CLASSES):
-    print("two convolutional layers max pooling 3 inbetween")
+    print("two convolutional layers max pooling 5 inbetween w dropout")
     embedding_layer = create_embedding_layer(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH)
     input_sequence = Input(shape = (MAX_SEQUENCE_LENGTH,),dtype = 'int32')
     embedded_sequences = embedding_layer(input_sequence)
     x = Conv1D(128, 5, activation='relu',name = "cv1")(embedded_sequences)
-    x = MaxPooling1D(3)(x)
+    x = Dropout(.3)(x)
+    x = MaxPooling1D(5)(x)
     x = Conv1D(128, 5, activation='relu',name = "cv2")(x)
     x = Flatten()(x)
     x = Dense(2048, activation='relu')(x)
@@ -140,6 +142,26 @@ def create_model2(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NU
                   metrics=['acc'])
     return model
 
+def create_model3(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NUM_CLASSES):
+    print("two convolutional layers no max pooling inbetween w dropout")
+    embedding_layer = create_embedding_layer(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH)
+    input_sequence = Input(shape = (MAX_SEQUENCE_LENGTH,),dtype = 'int32')
+    embedded_sequences = embedding_layer(input_sequence)
+    x = Conv1D(128, 5, activation='relu',name = "cv1")(embedded_sequences)
+    x = Dropout(.3)(x)
+    x = Conv1D(128, 5, activation='relu',name = "cv2")(x)
+    x = Flatten()(x)
+    x = Dropout(.3)(x)
+    x = Dense(2048, activation='relu')(x)
+    output = Dense(NUM_CLASSES, activation='softmax')(x)
+    rmsop = optimizers.RMSprop(lr=0.005, rho=0.9, epsilon=None, decay=0.000002)
+    model = Model(input_sequence,output)
+    model.compile(loss='categorical_crossentropy',
+                  optimizer=rmsop,
+                  metrics=['acc'])
+    return model
+
+
 def create_modelcurrent(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NUM_CLASSES):
     print("one conv layer with global max pooling")
     embedding_layer = create_embedding_layer(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH)
@@ -148,6 +170,7 @@ def create_modelcurrent(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LEN
     x = Conv1D(128, 5, activation='relu',name = "cv1")(embedded_sequences)
     x = MaxPooling1D(5)(x)
     x = GlobalMaxPooling1D()(x)
+    x = Dropout(.3)(x)
     x = Dense(2048, activation='relu')(x)
     output = Dense(NUM_CLASSES, activation='softmax')(x)
     rmsop = optimizers.RMSprop(lr=0.005, rho=0.9, epsilon=None, decay=0.000002)
@@ -187,7 +210,7 @@ def create_confusion_matrix(y_true,predictions,sub_mapping):
 if __name__ =='__main__':
     import datetime
     now = datetime.datetime.now()
-    test_num = 2
+    test_num = 3
     datestr = 'models/'+str(test_num)+'_'+str(now.month) +'_' + str(now.day)
     t1 = time.time()
     #get data for x and y from the given sub_list
@@ -228,7 +251,7 @@ if __name__ =='__main__':
     t2 = time.time()
     print("prepping to fit model took: {} minutes".format((t2-t1)/60))
     #fitting model
-    model.fit(X_train,y_train,batch_size=5000,epochs = 4,validation_data=(X_val,y_val),class_weight = class_weights)
+    model.fit(X_train,y_train,batch_size=5000,epochs = 8,validation_data=(X_val,y_val),class_weight = class_weights)
 
     t2 = time.time()
 
@@ -254,7 +277,7 @@ if __name__ =='__main__':
                          NUM_CLASSES = len(y_train[0]))
 
     #fitting model
-    model2.fit(X_train,y_train,batch_size=5000,epochs = 4,validation_data=(X_val,y_val),class_weight = class_weights)
+    model2.fit(X_train,y_train,batch_size=5000,epochs = 8,validation_data=(X_val,y_val),class_weight = class_weights)
 
     t2 = time.time()
 
@@ -265,6 +288,25 @@ if __name__ =='__main__':
     model2.save(datestr+'m_2_model.HDF5')
     with open(datestr+'m_2_index.pkl','wb') as f:
         pickle.dump(word_index,f)
+    model3 = create_model2(word_index = word_index,
+                          embedding_dict= embedding_dict,
+                          EMBEDDING_DIM= 300,
+                          MAX_SEQUENCE_LENGTH = 100,
+                         NUM_CLASSES = len(y_train[0]))
+
+    #fitting model
+    model3.fit(X_train,y_train,batch_size=5000,epochs = 8,validation_data=(X_val,y_val),class_weight = class_weights)
+
+    t2 = time.time()
+
+    print("Time to train model3: {} minutes".format((t2-t1)/60))
+    with open(datestr+'m_2_subdict.pkl','wb') as f:
+        pickle.dump(sub_dict,f)
+    print("trying to pickle models")
+    model3.save(datestr+'m_2_model.HDF5')
+    with open(datestr+'m_2_index.pkl','wb') as f:
+        pickle.dump(word_index,f)
+
 
     modelcurrent = create_modelcurrent(word_index = word_index,
                           embedding_dict= embedding_dict,
@@ -273,7 +315,7 @@ if __name__ =='__main__':
                          NUM_CLASSES = len(y_train[0]))
 
     #fitting model
-    modelcurrent.fit(X_train,y_train,batch_size=5000,epochs = 4,validation_data=(X_val,y_val),class_weight = class_weights)
+    modelcurrent.fit(X_train,y_train,batch_size=5000,epochs = 8,validation_data=(X_val,y_val),class_weight = class_weights)
     with open(datestr+'m_3_subdict.pkl','wb') as f:
         pickle.dump(sub_dict,f)
     print("trying to pickle models")
