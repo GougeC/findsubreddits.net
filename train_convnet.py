@@ -125,7 +125,7 @@ def create_model(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NUM
     output = Dense(NUM_CLASSES, activation='softmax')(x)
     rmsop = optimizers.RMSprop(lr=0.005, rho=0.9, epsilon=None, decay=0.000002)
     model = Model(input_sequence,output)
-    model = multi_gpu_model(model,2)
+    #model = multi_gpu_model(model,2)
     model.compile(loss='categorical_crossentropy',
                   optimizer=rmsop,
                   metrics=['acc'])
@@ -145,7 +145,7 @@ def create_model2(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NU
     output = Dense(NUM_CLASSES, activation='softmax')(x)
     rmsop = optimizers.RMSprop(lr=0.005, rho=0.9, epsilon=None, decay=0.000002)
     model = Model(input_sequence,output)
-    model = multi_gpu_model(model,2)
+    #model = multi_gpu_model(model,2)
 
     model.compile(loss='categorical_crossentropy',
                   optimizer=rmsop,
@@ -166,7 +166,7 @@ def create_model3(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NU
     output = Dense(NUM_CLASSES, activation='softmax')(x)
     rmsop = optimizers.RMSprop(lr=0.005, rho=0.9, epsilon=None, decay=0.000002)
     model = Model(input_sequence,output)
-    model = multi_gpu_model(model,2)
+    #model = multi_gpu_model(model,2)
     model.compile(loss='categorical_crossentropy',
                   optimizer=rmsop,
                   metrics=['acc'])
@@ -186,7 +186,7 @@ def create_modelcurrent(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LEN
     output = Dense(NUM_CLASSES, activation='softmax')(x)
     rmsop = optimizers.RMSprop(lr=0.005, rho=0.9, epsilon=None, decay=0.000002)
     model = Model(input_sequence,output)
-    model = multi_gpu_model(model,2)
+    #model = multi_gpu_model(model,2)
 
     model.compile(loss='categorical_crossentropy',
                   optimizer=rmsop,
@@ -285,9 +285,7 @@ if __name__ =='__main__':
 
     #creates keras model for training
     print("creating model")
-    with tf.device('/cpu:0'):
-
-        model = create_model(word_index = word_index,
+    model = create_model(word_index = word_index,
                               embedding_dict= embedding_dict,
                               EMBEDDING_DIM= 300,
                               MAX_SEQUENCE_LENGTH = 100,
@@ -316,9 +314,9 @@ if __name__ =='__main__':
 
     #creates keras model for training
     print("creating model")
-    with tf.device('/cpu:0'):
+    #with tf.device('/cpu:0'):
 
-        model2 = create_model2(word_index = word_index,
+    model2 = create_model2(word_index = word_index,
                               embedding_dict= embedding_dict,
                               EMBEDDING_DIM= 300,
                               MAX_SEQUENCE_LENGTH = 100,
@@ -336,9 +334,9 @@ if __name__ =='__main__':
     model2.save(datestr+'m_2_model.HDF5')
     with open(datestr+'m_2_index.pkl','wb') as f:
         pickle.dump(word_index,f)
-    with tf.device('/cpu:0'):
+    #with tf.device('/cpu:0'):
 
-        model3 = create_model2(word_index = word_index,
+    model3 = create_model2(word_index = word_index,
                               embedding_dict= embedding_dict,
                               EMBEDDING_DIM= 300,
                               MAX_SEQUENCE_LENGTH = 100,
