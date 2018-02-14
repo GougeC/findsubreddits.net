@@ -14,6 +14,7 @@ import tensorflow as tf
 from keras import backend as K
 from keras.layers.core import Lambda
 from keras.layers import Input, merge
+from keras.utils import multi_gpu_model
 
 
 
@@ -124,6 +125,7 @@ def create_model(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NUM
     output = Dense(NUM_CLASSES, activation='softmax')(x)
     rmsop = optimizers.RMSprop(lr=0.005, rho=0.9, epsilon=None, decay=0.000002)
     model = Model(input_sequence,output)
+    model = multi_gpu_model(model,2)
     model.compile(loss='categorical_crossentropy',
                   optimizer=rmsop,
                   metrics=['acc'])
@@ -143,6 +145,8 @@ def create_model2(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NU
     output = Dense(NUM_CLASSES, activation='softmax')(x)
     rmsop = optimizers.RMSprop(lr=0.005, rho=0.9, epsilon=None, decay=0.000002)
     model = Model(input_sequence,output)
+    model = multi_gpu_model(model,2)
+
     model.compile(loss='categorical_crossentropy',
                   optimizer=rmsop,
                   metrics=['acc'])
@@ -162,6 +166,7 @@ def create_model3(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NU
     output = Dense(NUM_CLASSES, activation='softmax')(x)
     rmsop = optimizers.RMSprop(lr=0.005, rho=0.9, epsilon=None, decay=0.000002)
     model = Model(input_sequence,output)
+    model = multi_gpu_model(model,2)
     model.compile(loss='categorical_crossentropy',
                   optimizer=rmsop,
                   metrics=['acc'])
@@ -181,6 +186,8 @@ def create_modelcurrent(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LEN
     output = Dense(NUM_CLASSES, activation='softmax')(x)
     rmsop = optimizers.RMSprop(lr=0.005, rho=0.9, epsilon=None, decay=0.000002)
     model = Model(input_sequence,output)
+    model = multi_gpu_model(model,2)
+
     model.compile(loss='categorical_crossentropy',
                   optimizer=rmsop,
                   metrics=['acc'])
@@ -278,14 +285,15 @@ if __name__ =='__main__':
 
     #creates keras model for training
     print("creating model")
-    model = create_model(word_index = word_index,
-                          embedding_dict= embedding_dict,
-                          EMBEDDING_DIM= 300,
-                          MAX_SEQUENCE_LENGTH = 100,
-                         NUM_CLASSES = len(y_train[0]))
+    with tf.device('/cpu:0'):
+
+        model = create_model(word_index = word_index,
+                              embedding_dict= embedding_dict,
+                              EMBEDDING_DIM= 300,
+                              MAX_SEQUENCE_LENGTH = 100,
+                             NUM_CLASSES = len(y_train[0]))
 
     t2 = time.time()
-    model = to_multi_gpu(model)
 
     print("prepping to fit model took: {} minutes".format((t2-t1)/60))
     #fitting model
@@ -308,14 +316,15 @@ if __name__ =='__main__':
 
     #creates keras model for training
     print("creating model")
-    model2 = create_model2(word_index = word_index,
-                          embedding_dict= embedding_dict,
-                          EMBEDDING_DIM= 300,
-                          MAX_SEQUENCE_LENGTH = 100,
-                         NUM_CLASSES = len(y_train[0]))
+    with tf.device('/cpu:0'):
+
+        model2 = create_model2(word_index = word_index,
+                              embedding_dict= embedding_dict,
+                              EMBEDDING_DIM= 300,
+                              MAX_SEQUENCE_LENGTH = 100,
+                             NUM_CLASSES = len(y_train[0]))
 
     #fitting model
-    model2 = to_multi_gpu(model2)
     model2.fit(X_train,y_train,batch_size=5000,epochs = 8,validation_data=(X_val,y_val),class_weight = class_weights)
 
     t2 = time.time()
@@ -327,14 +336,15 @@ if __name__ =='__main__':
     model2.save(datestr+'m_2_model.HDF5')
     with open(datestr+'m_2_index.pkl','wb') as f:
         pickle.dump(word_index,f)
-    model3 = create_model2(word_index = word_index,
-                          embedding_dict= embedding_dict,
-                          EMBEDDING_DIM= 300,
-                          MAX_SEQUENCE_LENGTH = 100,
-                         NUM_CLASSES = len(y_train[0]))
+    with tf.device('/cpu:0'):
+
+        model3 = create_model2(word_index = word_index,
+                              embedding_dict= embedding_dict,
+                              EMBEDDING_DIM= 300,
+                              MAX_SEQUENCE_LENGTH = 100,
+                             NUM_CLASSES = len(y_train[0]))
 
     #fitting model
-    model3 = to_multi_gpu(model3)
     model3.fit(X_train,y_train,batch_size=5000,epochs = 8,validation_data=(X_val,y_val),class_weight = class_weights)
 
     t2 = time.time()
@@ -353,7 +363,6 @@ if __name__ =='__main__':
                           EMBEDDING_DIM= 300,
                           MAX_SEQUENCE_LENGTH = 100,
                          NUM_CLASSES = len(y_train[0]))
-    modelcurrent = to_multi_gpu(modelcurrent)
     #fitting model
 
     modelcurrent.fit(X_train,y_train,batch_size=5000,epochs = 8,validation_data=(X_val,y_val),class_weight = class_weights)
