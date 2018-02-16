@@ -294,7 +294,7 @@ if __name__ =='__main__':
 
     print("prepping to fit model took: {} minutes".format((t2-t1)/60))
     #fitting model
-    model.fit(X_train,y_train,batch_size=5000,epochs = 8,validation_data=(X_val,y_val),class_weight = class_weights)
+    model.fit(X_train,y_train,batch_size=5000,epochs = 6,validation_data=(X_val,y_val),class_weight = class_weights)
 
     t2 = time.time()
 
@@ -364,7 +364,7 @@ if __name__ =='__main__':
                          NUM_CLASSES = len(y_train[0]))
     #fitting model
 
-    modelcurrent.fit(X_train,y_train,batch_size=5000,epochs = 8,validation_data=(X_val,y_val),class_weight = class_weights)
+    modelcurrent.fit(X_train,y_train,batch_size=5000,epochs = 3,validation_data=(X_val,y_val),class_weight = class_weights)
     with open(datestr+'m_3_subdict.pkl','wb') as f:
         pickle.dump(sub_dict,f)
     print("trying to pickle models")
