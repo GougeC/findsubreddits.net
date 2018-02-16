@@ -113,7 +113,7 @@ def create_embedding_dict(sublist,size,epochs,use_GloVe = False):
 
 
 def create_model(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NUM_CLASSES):
-    print("1 conv layer no max pooling")
+    print("1 conv layer no max pooling w dropout")
     embedding_layer = create_embedding_layer(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH)
     input_sequence = Input(shape = (MAX_SEQUENCE_LENGTH,),dtype = 'int32')
     embedded_sequences = embedding_layer(input_sequence)
@@ -181,7 +181,6 @@ def create_modelcurrent(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LEN
     x = Conv1D(128, 5, activation='relu',name = "cv1")(embedded_sequences)
     x = MaxPooling1D(5)(x)
     x = GlobalMaxPooling1D()(x)
-    x = Dropout(.3)(x)
     x = Dense(2048, activation='relu')(x)
     output = Dense(NUM_CLASSES, activation='softmax')(x)
     rmsop = optimizers.RMSprop(lr=0.005, rho=0.9, epsilon=None, decay=0.000002)
@@ -253,7 +252,7 @@ def slice_batch(x,n_gpus,part):
 if __name__ =='__main__':
     import datetime
     now = datetime.datetime.now()
-    test_num = 3
+    test_num = 4
     datestr = 'models/'+str(test_num)+'_'+str(now.month) +'_' + str(now.day)
     t1 = time.time()
     #get data for x and y from the given sub_list
@@ -306,6 +305,8 @@ if __name__ =='__main__':
     model.save(datestr+'m_1_model.HDF5')
     with open(datestr+'m_1_index.pkl','wb') as f:
         pickle.dump(word_index,f)
+    with open(datestr+'m_1_subdict.pkl','wb') as f:
+        pickle.dump(sub_dict,f)
 
     #print(confusion_matrix)
     t1 = time.time()
@@ -323,17 +324,17 @@ if __name__ =='__main__':
                              NUM_CLASSES = len(y_train[0]))
 
     #fitting model
-    model2.fit(X_train,y_train,batch_size=5000,epochs = 8,validation_data=(X_val,y_val),class_weight = class_weights)
+    #model2.fit(X_train,y_train,batch_size=5000,epochs = 8,validation_data=(X_val,y_val),class_weight = class_weights)
 
     t2 = time.time()
 
-    print("Time to train model2: {} minutes".format((t2-t1)/60))
-    with open(datestr+'m_2_subdict.pkl','wb') as f:
-        pickle.dump(sub_dict,f)
-    print("trying to pickle models")
-    model2.save(datestr+'m_2_model.HDF5')
-    with open(datestr+'m_2_index.pkl','wb') as f:
-        pickle.dump(word_index,f)
+    #print("Time to train model2: {} minutes".format((t2-t1)/60))
+    #with open(datestr+'m_2_subdict.pkl','wb') as f:
+    #    pickle.dump(sub_dict,f)
+    #print("trying to pickle models")
+    #model2.save(datestr+'m_2_model.HDF5')
+    #with open(datestr+'m_2_index.pkl','wb') as f:
+#        pickle.dump(word_index,f)
     #with tf.device('/cpu:0'):
 
     model3 = create_model2(word_index = word_index,
@@ -343,17 +344,17 @@ if __name__ =='__main__':
                              NUM_CLASSES = len(y_train[0]))
 
     #fitting model
-    model3.fit(X_train,y_train,batch_size=5000,epochs = 8,validation_data=(X_val,y_val),class_weight = class_weights)
+    #model3.fit(X_train,y_train,batch_size=5000,epochs = 8,validation_data=(X_val,y_val),class_weight = class_weights)
 
     t2 = time.time()
 
-    print("Time to train model3: {} minutes".format((t2-t1)/60))
-    with open(datestr+'m_2_subdict.pkl','wb') as f:
-        pickle.dump(sub_dict,f)
-    print("trying to pickle models")
-    model3.save(datestr+'m_2_model.HDF5')
-    with open(datestr+'m_2_index.pkl','wb') as f:
-        pickle.dump(word_index,f)
+    #print("Time to train model3: {} minutes".format((t2-t1)/60))
+    #with open(datestr+'m_2_subdict.pkl','wb') as f:
+#        pickle.dump(sub_dict,f)
+#    print("trying to pickle models")
+#    model3.save(datestr+'m_2_model.HDF5')
+#    with open(datestr+'m_2_index.pkl','wb') as f:
+#        pickle.dump(word_index,f)
 
 
     modelcurrent = create_modelcurrent(word_index = word_index,
