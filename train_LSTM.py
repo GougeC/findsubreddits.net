@@ -6,6 +6,7 @@ import train_convnet as tc
 from keras.models import Sequential
 from keras.layers import LSTM, Dense ,Dropout,GRU,Recurrent
 import time
+import pickle
 if __name__ == '__main__':
     import datetime
     now = datetime.datetime.now()
