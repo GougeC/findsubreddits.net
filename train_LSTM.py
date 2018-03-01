@@ -27,7 +27,7 @@ if __name__ == '__main__':
     word_index, X_train,X_val,y_train,y_val = tc.create_word_index_train_val(X,y,
                                                                               MAX_SEQUENCE_LENGTH = 100,
                                                                               MAX_WORDS=20000,
-                                                                             test_size = 1000)
+                                                                             test_size = 100000)
 
     embedding_dict = tc.create_embedding_dict(sub_list,
                                             size = 300,
@@ -36,11 +36,12 @@ if __name__ == '__main__':
 
 
     embedding_layer = tc.create_embedding_layer(word_index,embedding_dict,300,100)
-    model = Sequential()
     t2 = time.time()
 
     print("prepping to fit model took: {} minutes".format((t2-t1)/60))
+    t1 = time.time()
 
+    model = Sequential()
     model.add(embedding_layer)
     model.add(LSTM(200, return_sequences=False, activation='softmax'))
     model.add(Dense(len(sub_list), activation='softmax'))
@@ -59,4 +60,28 @@ if __name__ == '__main__':
     with open(datestr+'m_1_index.pkl','wb') as f:
         pickle.dump(word_index,f)
     with open(datestr+'m_1_subdict.pkl','wb') as f:
+        pickle.dump(sub_dict,f)
+
+    t1 = time.time()
+
+    model = Sequential()
+    model.add(embedding_layer)
+    model.add(LSTM(400, return_sequences=False, activation='softmax'))
+    model.add(Dense(100,activation = 'relu'))
+    model.add(Dense(len(sub_list), activation='softmax'))
+    model.compile(loss='categorical_crossentropy', optimizer = 'rmsprop', metrics = ['acc'])
+    model.fit(X_train, y_train, epochs = 5, class_weight=class_weights,validation_data=(X_val,y_val))
+
+    cf = tc.create_confusion_matrix(y_val, model.predict(X_val),sub_dict)
+    print(cf)
+    t2 = time.time()
+
+    print("Time to train network with GloVe embeddings: {} minutes".format((t2-t1)/60))
+    #evaluate model
+
+
+    model.save(datestr+'m_2_model.HDF5')
+    with open(datestr+'m_2_index.pkl','wb') as f:
+        pickle.dump(word_index,f)
+    with open(datestr+'m_2_subdict.pkl','wb') as f:
         pickle.dump(sub_dict,f)
