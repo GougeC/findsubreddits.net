@@ -21,6 +21,7 @@ if __name__ == '__main__':
     with open('subreddit_class_weights.pkl','rb') as f:
         sub_weights = pickle.load(f)
     sub_to_ind = {v:k for k,v in sub_dict.items()}
+    class_weights = {}
     for sub,weight in sub_weights.items():
         class_weights[sub_to_ind[sub]] = weight
     t1 = time.time()
