@@ -44,7 +44,7 @@ def create_x_y(sublist):
         ind+=1
     return X,y,sub_dict
 
-def create_word_index_train_val(X,y,MAX_WORDS,MAX_SEQUENCE_LENGTH):
+def create_word_index_train_val(X,y,MAX_WORDS,MAX_SEQUENCE_LENGTH,test_size = 100000):
     '''
     RETURNS : word_index, X_train,X_val,y_train,y_val
     takes in an X and y from the make_x_y function and creates a word_index dictionary and padds each X value
@@ -68,8 +68,8 @@ def create_word_index_train_val(X,y,MAX_WORDS,MAX_SEQUENCE_LENGTH):
     labels = to_categorical(np.array(y))
     inds = np.arange(len(data))
     np.random.shuffle(inds)
-    test_inds = inds[:100000]
-    train_inds = inds[100000:]
+    test_inds = inds[:test_size]
+    train_inds = inds[test_size:]
     X_train, X_val, y_train,y_val = data[train_inds],data[test_inds],labels[train_inds],labels[test_inds]
     return word_index, X_train,X_val,y_train,y_val
 
