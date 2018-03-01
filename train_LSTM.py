@@ -48,7 +48,7 @@ if __name__ == '__main__':
     model.add(LSTM(200, return_sequences=False, activation='softmax'))
     model.add(Dense(len(sub_list), activation='softmax'))
     model.compile(loss='categorical_crossentropy', optimizer = 'rmsprop', metrics = ['acc'])
-    model.fit(X_train, y_train, epochs = 5, class_weight=class_weights,validation_data=(X_val,y_val))
+    model.fit(X_train, y_train, epochs = 5,  class_weight=class_weights,batch_size= 1000,validation_data=(X_val,y_val))
 
     cf = tc.create_confusion_matrix(y_val, model.predict(X_val),sub_dict)
     print(cf)
@@ -72,7 +72,7 @@ if __name__ == '__main__':
     model.add(Dense(100,activation = 'relu'))
     model.add(Dense(len(sub_list), activation='softmax'))
     model.compile(loss='categorical_crossentropy', optimizer = 'rmsprop', metrics = ['acc'])
-    model.fit(X_train, y_train, epochs = 5, class_weight=class_weights,validation_data=(X_val,y_val))
+    model.fit(X_train, y_train, epochs = 5, class_weight=class_weights,batch_size= 1000,validation_data=(X_val,y_val))
 
     cf = tc.create_confusion_matrix(y_val, model.predict(X_val),sub_dict)
     print(cf)
@@ -86,4 +86,28 @@ if __name__ == '__main__':
     with open(datestr+'m_2_index.pkl','wb') as f:
         pickle.dump(word_index,f)
     with open(datestr+'m_2_subdict.pkl','wb') as f:
+        pickle.dump(sub_dict,f)
+
+    t1 = time.time()
+
+    model = Sequential()
+    model.add(embedding_layer)
+    model.add(GRU(400, return_sequences=False, activation='softmax'))
+    model.add(Dense(100,activation = 'relu'))
+    model.add(Dense(len(sub_list), activation='softmax'))
+    model.compile(loss='categorical_crossentropy', optimizer = 'rmsprop', metrics = ['acc'])
+    model.fit(X_train, y_train, epochs = 5, class_weight=class_weights,batch_size= 1000,validation_data=(X_val,y_val))
+
+    cf = tc.create_confusion_matrix(y_val, model.predict(X_val),sub_dict)
+    print(cf)
+    t2 = time.time()
+
+    print("Time to train network with GloVe embeddings: {} minutes".format((t2-t1)/60))
+    #evaluate model
+
+
+    model.save(datestr+'m_3_model.HDF5')
+    with open(datestr+'m_3_index.pkl','wb') as f:
+        pickle.dump(word_index,f)
+    with open(datestr+'m_3_subdict.pkl','wb') as f:
         pickle.dump(sub_dict,f)
