@@ -10,7 +10,7 @@ import pickle
 if __name__ == '__main__':
     import datetime
     now = datetime.datetime.now()
-    test_num = 1
+    test_num = 2
     datestr = 'models/RNN'+str(test_num)+'_'+str(now.month) +'_' + str(now.day)
     sub_list = pd.read_csv('sub_list.csv',header=None)[0].values.tolist()
     print("fitting {} subs".format(len(sub_list)))
@@ -45,7 +45,7 @@ if __name__ == '__main__':
 
     model = Sequential()
     model.add(embedding_layer)
-    model.add(LSTM(200, return_sequences=False, activation='softmax'))
+    model.add(LSTM(1000, return_sequences=False, activation='softmax'))
     model.add(Dense(len(sub_list), activation='softmax'))
     model.compile(loss='categorical_crossentropy', optimizer = 'rmsprop', metrics = ['acc'])
     model.fit(X_train, y_train, epochs = 20,  class_weight=class_weights,batch_size= 1000,validation_data=(X_val,y_val))
@@ -68,8 +68,8 @@ if __name__ == '__main__':
 
     model = Sequential()
     model.add(embedding_layer)
-    model.add(LSTM(200, return_sequences=False, activation='softmax'))
-    model.add(Dense(100,activation = 'relu'))
+    model.add(LSTM(1000, return_sequences=False, activation='softmax'))
+    model.add(Dense(1000,activation = 'relu'))
     model.add(Dense(len(sub_list), activation='softmax'))
     model.compile(loss='categorical_crossentropy', optimizer = 'rmsprop', metrics = ['acc'])
     model.fit(X_train, y_train, epochs = 20, class_weight=class_weights,batch_size= 1000,validation_data=(X_val,y_val))
@@ -92,7 +92,7 @@ if __name__ == '__main__':
 
     model = Sequential()
     model.add(embedding_layer)
-    model.add(GRU(200, return_sequences=False, activation='softmax'))
+    model.add(GRU(1000, return_sequences=False, activation='softmax'))
     model.add(Dense(len(sub_list), activation='softmax'))
     model.compile(loss='categorical_crossentropy', optimizer = 'rmsprop', metrics = ['acc'])
     model.fit(X_train, y_train, epochs = 20, class_weight=class_weights,batch_size= 1000,validation_data=(X_val,y_val))
