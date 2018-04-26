@@ -8,9 +8,9 @@ import gensim
 import time
 
 ##This is a bunch of helper functions for the Reddit2vec project
+DBNAME = "reddit_capstone425"
 
-
-def connect_to_mongo():
+def connect_to_mongo(dbname = DBNAME):
     '''
     Connects to a mongodb client using pymongo and connects to the 'reddit_capstone' db
     '''
@@ -18,7 +18,7 @@ def connect_to_mongo():
         s = f.read()
     s = s[:-1]
     client = pymongo.MongoClient(s)
-    db = client.get_database('reddit_capstone')
+    db = client.get_database(dbname)
     return db
 
 def clean_and_tokenize(comment, filter_stopwords = False, cap_at_100 = False):

@@ -11,13 +11,14 @@ import requests
 from bs4 import BeautifulSoup
 import pymongo
 
+DBNAME = "reddit_capstone425"
 
-def connect_to_mongo():
+def connect_to_mongo(dbname = DBNAME):
     with open('keys/mongoconnect.txt') as f:
         s = f.read()
     s = s[:-1]
     client = pymongo.MongoClient(s)
-    db = client.get_database('reddit_capstone')
+    db = client.get_database(dbname)
     return db
 
 def do_list_of_subs(subreddit_list,keys,date,user_list):
