@@ -211,9 +211,9 @@ if __name__ =='__main__':
     modelcurrent.fit(X_train,y_train,batch_size=5000,epochs = 3,validation_data=(X_val,y_val),class_weight = class_weights)
 
     print("trying to pickle model")
-    model2.save(datestr+'model.HDF5')
+    model2.save(datestr+'CONV_model.HDF5')
 
-    with open(datestr+'subdict.pkl','wb') as f:
+    with open(datestr+'CONV_subdict.pkl','wb') as f:
         pickle.dump(sub_dict,f)
-    with open(datestr+'index.pkl','wb') as f:
+    with open(datestr+'CONV_index.pkl','wb') as f:
             pickle.dump(word_index,f)
