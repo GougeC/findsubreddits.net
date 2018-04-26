@@ -1,11 +1,15 @@
 import keras
 import pandas as pd
 import numpy as np
-import train_convnet as tc
-from keras.models import Sequential
-from keras.layers import LSTM, Dense ,Dropout,GRU,Recurrent
 import time
 import pickle
+
+from keras.models import Sequential
+from keras.layers import LSTM, Dense ,Dropout,GRU,Recurrent
+
+import train_convnet as tc
+import project_utils as utils
+
 if __name__ == '__main__':
     import datetime
     now = datetime.datetime.now()
@@ -25,18 +29,18 @@ if __name__ == '__main__':
         class_weights[sub_to_ind[sub]] = weight
     t1 = time.time()
 
-    word_index, X_train,X_val,y_train,y_val = tc.create_word_index_train_val(X,y,
+    word_index, X_train,X_val,y_train,y_val = utils.create_word_index_train_val(X,y,
                                                                              MAX_SEQUENCE_LENGTH = 100,
                                                                              MAX_WORDS=20000,
                                                                              test_size = 100000)
 
-    embedding_dict = tc.create_embedding_dict(sub_list,
+    embedding_dict = utils.create_embedding_dict(sub_list,
                                             size = 300,
                                             epochs = 15,
                                             use_GloVe = True)
 
 
-    embedding_layer = tc.create_embedding_layer(word_index,embedding_dict,300,100)
+    embedding_layer = utils.create_embedding_layer(word_index,embedding_dict,300,100)
     t2 = time.time()
 
     print("prepping to fit model took: {} minutes".format((t2-t1)/60))
@@ -49,7 +53,8 @@ if __name__ == '__main__':
     model.compile(loss='categorical_crossentropy', optimizer = 'rmsprop', metrics = ['acc'])
     model.fit(X_train, y_train, epochs = 20,  class_weight=class_weights,batch_size= 1000,validation_data=(X_val,y_val))
 
-    cf = tc.create_confusion_matrix(y_val, model.predict(X_val),sub_dict)
+    cf = utils.create_confusion_matrix(y_val, model.predict(X_val),sub_dict)
+
     print(cf)
     t2 = time.time()
 

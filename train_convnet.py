@@ -1,116 +1,26 @@
 import numpy as np
 import pandas as pd
 import pymongo
-from keras.layers import Embedding, Conv1D, MaxPooling1D ,Flatten, Dense, GlobalMaxPooling1D, Dropout, merge
-from keras.preprocessing.text import Tokenizer,text_to_word_sequence
-from keras.preprocessing.sequence import pad_sequences
-from keras.models import Model, Sequential
-from keras import Input
-from keras.utils import to_categorical
-import project_utils as utils
 import pickle
-import train_word2vec
+import time
+
+from keras.layers import Embedding, Conv1D, MaxPooling1D ,Flatten, Dense, GlobalMaxPooling1D, Dropout, merge
+from keras.preprocessing.text import Tokenizer
+from keras.models import Model
+from keras import Input
+
+
 import tensorflow as tf
 from keras import backend as K
 from keras.layers.core import Lambda
 from keras.layers import Input, merge
 from keras.utils import multi_gpu_model
-
-
-
 from keras import optimizers
-from sklearn.model_selection import train_test_split
+
 from sklearn.metrics import f1_score,roc_auc_score
 
-import time
-
-def create_x_y(sublist):
-    '''
-    takes in a list of subreddits and gets the raw data from the subs. It then adds them all
-    to the same array and adds the subreddit as a numerical label.
-    Returns: a list of strings, a list of numbers and a dictionary to map those numbers to which subreddit
-    they represent
-    '''
-    sub_dict = {}
-    ind = 0
-    X = []
-    y = []
-    for sub in sublist:
-        data = utils.get_sub_raw(sub)
-        for point in data:
-            X.append(point)
-            y.append(ind)
-        sub_dict[ind] = sub
-        ind+=1
-    return X,y,sub_dict
-
-def create_word_index_train_val(X,y,MAX_WORDS,MAX_SEQUENCE_LENGTH,test_size = 100000):
-    '''
-    RETURNS : word_index, X_train,X_val,y_train,y_val
-    takes in an X and y from the make_x_y function and creates a word_index dictionary and padds each X value
-    to the MAX_WORDS parameter (or truncates it) it then splits the set into train test sets
-    '''
-    tokenizer = Tokenizer(num_words = MAX_WORDS,
-                     filters = '!"#$%&()*+,-./:;<=>?@[\\]^_`{|}~\t\n',
-                     lower = True,
-                     split = " ",
-                     char_level = False)
-    print("fitting tokenizer")
-    t1 = time.time()
-    tokenizer.fit_on_texts(X)
-    t2 = time.time()
-    print("done. time : {} seconds".format(t2-t1))
-    s = tokenizer.texts_to_sequences(X)
-    print("padding sequences")
-    word_index = tokenizer.word_index
-    data = pad_sequences(sequences = s, maxlen = MAX_SEQUENCE_LENGTH)
-    print("processing data and splitting into train_test")
-    labels = to_categorical(np.array(y))
-    inds = np.arange(len(data))
-    np.random.shuffle(inds)
-    test_inds = inds[:test_size]
-    train_inds = inds[test_size:]
-    X_train, X_val, y_train,y_val = data[train_inds],data[test_inds],labels[train_inds],labels[test_inds]
-    return word_index, X_train,X_val,y_train,y_val
-
-def create_embedding_matrix(word_index,embedding_dict,EMBEDDING_DIM):
-    '''
-    given a word index, embedding dict and the length of the embeddings this makes a numpy matrix
-    that can be used to make a keras embedding layer
-    '''
-    embedding_matrix = np.zeros((len(word_index)+1,EMBEDDING_DIM))
-    for word, ind in word_index.items():
-        if word in embedding_dict:
-            embedding_vector = embedding_dict[word]
-            embedding_matrix[ind] = embedding_vector
-    return embedding_matrix
-
-
-def create_embedding_layer(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH):
-    '''
-    creates an embedding layer for a keras model
-    '''
-    embedding_matrix = create_embedding_matrix(word_index,embedding_dict,EMBEDDING_DIM)
-    embedding_layer = Embedding(len(word_index)+1,EMBEDDING_DIM,
-                            weights = [embedding_matrix],
-                           input_length = MAX_SEQUENCE_LENGTH,
-                           trainable = False)
-    return embedding_layer
-
-def create_embedding_dict(sublist,size,epochs,use_GloVe = False):
-    '''
-    trains a word embedding with gensim and returns a dictionary
-    if use_GloVe it returns the 300 length GloVe embeddings
-    '''
-    if use_GloVe:
-        embedding_dict = utils.process_embeddings('embeddings/glove.6B.300d.txt')
-        return embedding_dict
-    w2vmodel = train_word2vec.train_word2vec(sub_list,size = 100, epochs = 15)
-    embedding_dict = {}
-    for word in w2vmodel.wv.vocab:
-        embedding_dict[word] = w2vmodel.wv.word_vec(word)
-    return embedding_dict
-
+import train_word2vec
+from project_utils import create_x_y, create_word_index_train_val, create_embedding_dict, create_embedding_layer, connect_to_mongo
 
 def create_model(word_index,embedding_dict,EMBEDDING_DIM,MAX_SEQUENCE_LENGTH,NUM_CLASSES):
     print("1 conv layer no max pooling w dropout")
@@ -257,7 +167,7 @@ if __name__ =='__main__':
     t1 = time.time()
 
     #get data for x and y from the given sub_list
-    db = utils.connect_to_mongo('reddit_capstone425')
+    db = connect_to_mongo('reddit_capstone425')
 
     sub_list = pd.read_csv('sub_list.csv',header=None)[0].values.tolist()
 
