@@ -8,12 +8,14 @@ import gensim
 import time
 import multiprocessing
 
-def connect_to_mongo():
+DBNAME = 'reddit_capstone425'
+
+def connect_to_mongo(dbname = DBNAME):
     with open('keys/mongoconnect.txt') as f:
         s = f.read()
     s = s[:-1]
     client = pymongo.MongoClient(s)
-    db = client.get_database('reddit_capstone')
+    db = client.get_database(dbname)
     return db
 
 def yield_sentences(comment):
@@ -25,7 +27,7 @@ def yield_sentences(comment):
         s = s.replace('\n','')
         yield(nltk.word_tokenize(s.lower()))
 
-def subreddit_sentences(db,subname):
+def subreddit_sentences(db, subname):
     sub = db.posts.find({'subreddit':subname},{"data":1})
     for post in sub:
         for comment in post['data']['comments']:
@@ -35,7 +37,7 @@ def subreddit_sentences(db,subname):
             yield s
 
 class Sub_Iterator():
-    def __init__(self,list_of_subs):
+    def __init__(self, list_of_subs):
         self.sub_list = list_of_subs
         self.db = connect_to_mongo()
     def __iter__(self):
@@ -43,12 +45,13 @@ class Sub_Iterator():
             sub_gen = subreddit_sentences(self.db,sub)
             for s in sub_gen:
                 yield s
-def train_word2vec(subs, size = 300,epochs = 10, min_count = 10):
+
+def train_word2vec(subs, size = 300, epochs = 10, min_count = 10):
     n_cores = multiprocessing.cpu_count()
     print("Training word2vec on {} subreddits".format(len(subs)))
     t1 = time.time()
     sub_iter = Sub_Iterator(subs)
-    model = gensim.models.Word2Vec(sub_iter,size = size,window = 3, min_count = min_count,workers = n_cores)
+    model = gensim.models.Word2Vec(sub_iter, size = size, window = 3, min_count = min_count, workers = n_cores)
     sub_iter = Sub_Iterator(subs)
     t_words = model.corpus_count
     model.train(sub_iter,total_words = t_words,epochs = epochs)

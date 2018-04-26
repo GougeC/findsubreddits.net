@@ -2,7 +2,7 @@ import numpy as np
 from sklearn.decomposition import PCA
 from collections import Counter
 #helper function
-from w2vutils import clean_and_tokenize, process_embeddings
+from project_utils import clean_and_tokenize, process_embeddings
 
 ## this code is an adapted version of https://github.com/peter3125/sentence2vec/blob/master/sentence2vec.py
 ## by peter3125 on github (Peter de Vocht)

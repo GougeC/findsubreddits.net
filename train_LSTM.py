@@ -1,7 +1,6 @@
 import keras
 import pandas as pd
 import numpy as np
-import w2vutils as wv
 import train_convnet as tc
 from keras.models import Sequential
 from keras.layers import LSTM, Dense ,Dropout,GRU,Recurrent
@@ -27,8 +26,8 @@ if __name__ == '__main__':
     t1 = time.time()
 
     word_index, X_train,X_val,y_train,y_val = tc.create_word_index_train_val(X,y,
-                                                                              MAX_SEQUENCE_LENGTH = 100,
-                                                                              MAX_WORDS=20000,
+                                                                             MAX_SEQUENCE_LENGTH = 100,
+                                                                             MAX_WORDS=20000,
                                                                              test_size = 100000)
 
     embedding_dict = tc.create_embedding_dict(sub_list,

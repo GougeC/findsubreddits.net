@@ -1,13 +1,13 @@
 import numpy as np
 import pandas as pd
 import pymongo
-from keras.layers import Embedding,Conv1D,MaxPooling1D,Flatten,Dense,GlobalMaxPooling1D,Dropout,merge
+from keras.layers import Embedding, Conv1D, MaxPooling1D ,Flatten, Dense, GlobalMaxPooling1D, Dropout, merge
 from keras.preprocessing.text import Tokenizer,text_to_word_sequence
 from keras.preprocessing.sequence import pad_sequences
 from keras.models import Model, Sequential
 from keras import Input
 from keras.utils import to_categorical
-import w2vutils
+import project_utils as utils
 import pickle
 import train_word2vec
 import tensorflow as tf
@@ -36,7 +36,7 @@ def create_x_y(sublist):
     X = []
     y = []
     for sub in sublist:
-        data = w2vutils.get_sub_raw(sub)
+        data = utils.get_sub_raw(sub)
         for point in data:
             X.append(point)
             y.append(ind)
@@ -103,7 +103,7 @@ def create_embedding_dict(sublist,size,epochs,use_GloVe = False):
     if use_GloVe it returns the 300 length GloVe embeddings
     '''
     if use_GloVe:
-        embedding_dict = w2vutils.process_embeddings('embeddings/glove.6B.300d.txt')
+        embedding_dict = utils.process_embeddings('embeddings/glove.6B.300d.txt')
         return embedding_dict
     w2vmodel = train_word2vec.train_word2vec(sub_list,size = 100, epochs = 15)
     embedding_dict = {}
@@ -252,28 +252,34 @@ def slice_batch(x,n_gpus,part):
 if __name__ =='__main__':
     import datetime
     now = datetime.datetime.now()
-    test_num = 4
+    test_num = 1
     datestr = 'models/'+str(test_num)+'_'+str(now.month) +'_' + str(now.day)
     t1 = time.time()
-    #get data for x and y from the given sub_list
-    db = w2vutils.connect_to_mongo()
-    sub_list = pd.read_csv('sub_list.csv',header=None)[0].values.tolist()
-    print("getting data from db")
 
+    #get data for x and y from the given sub_list
+    db = utils.connect_to_mongo('reddit_capstone425')
+
+    sub_list = pd.read_csv('sub_list.csv',header=None)[0].values.tolist()
+
+    print("getting data from db")
     X,y,sub_dict = create_x_y(sub_list)
+
     with open(datestr+'m_1_dict.pkl','wb') as f:
         pickle.dump(sub_dict,f)
+
     with open('subreddit_class_weights.pkl','rb') as f:
         sub_weights = pickle.load(f)
     sub_to_ind = {v: k for k, v in sub_dict.items()}
+
     class_weights = {}
     for sub,weight in sub_weights.items():
         class_weights[sub_to_ind[sub]] = weight
     #create word index and training/validation data
+
     print("creating word index")
-    word_index, X_train,X_val,y_train,y_val = create_word_index_train_val(X,y,
+    word_index, X_train,X_val,y_train,y_val = create_word_index_train_val(X, y,
                                                                           MAX_SEQUENCE_LENGTH = 100,
-                                                                          MAX_WORDS=20000)
+                                                                          MAX_WORDS = 20000 )
     #gets embedding dict trains one if not use_GloVe
     #note glove always returns 300 len embedding atm
     print("creating embedding dict")
@@ -284,78 +290,6 @@ if __name__ =='__main__':
 
     #creates keras model for training
     print("creating model")
-    model = create_model(word_index = word_index,
-                              embedding_dict= embedding_dict,
-                              EMBEDDING_DIM= 300,
-                              MAX_SEQUENCE_LENGTH = 100,
-                             NUM_CLASSES = len(y_train[0]))
-
-    t2 = time.time()
-
-    print("prepping to fit model took: {} minutes".format((t2-t1)/60))
-    #fitting model
-    model.fit(X_train,y_train,batch_size=5000,epochs = 5,validation_data=(X_val,y_val),class_weight = class_weights)
-
-    t2 = time.time()
-
-    print("Time to train network with GloVe embeddings: {} minutes".format((t2-t1)/60))
-    #evaluate model
-
-
-    model.save(datestr+'m_1_model.HDF5')
-    with open(datestr+'m_1_index.pkl','wb') as f:
-        pickle.dump(word_index,f)
-    with open(datestr+'m_1_subdict.pkl','wb') as f:
-        pickle.dump(sub_dict,f)
-
-    #print(confusion_matrix)
-    t1 = time.time()
-    #get data for x and y from the given sub_list
-
-
-    #creates keras model for training
-    print("creating model")
-    #with tf.device('/cpu:0'):
-
-    model2 = create_model2(word_index = word_index,
-                              embedding_dict= embedding_dict,
-                              EMBEDDING_DIM= 300,
-                              MAX_SEQUENCE_LENGTH = 100,
-                             NUM_CLASSES = len(y_train[0]))
-
-    #fitting model
-    #model2.fit(X_train,y_train,batch_size=5000,epochs = 8,validation_data=(X_val,y_val),class_weight = class_weights)
-
-    t2 = time.time()
-
-    #print("Time to train model2: {} minutes".format((t2-t1)/60))
-    #with open(datestr+'m_2_subdict.pkl','wb') as f:
-    #    pickle.dump(sub_dict,f)
-    #print("trying to pickle models")
-    #model2.save(datestr+'m_2_model.HDF5')
-    #with open(datestr+'m_2_index.pkl','wb') as f:
-#        pickle.dump(word_index,f)
-    #with tf.device('/cpu:0'):
-
-    model3 = create_model2(word_index = word_index,
-                              embedding_dict= embedding_dict,
-                              EMBEDDING_DIM= 300,
-                              MAX_SEQUENCE_LENGTH = 100,
-                             NUM_CLASSES = len(y_train[0]))
-
-    #fitting model
-    #model3.fit(X_train,y_train,batch_size=5000,epochs = 8,validation_data=(X_val,y_val),class_weight = class_weights)
-
-    t2 = time.time()
-
-    #print("Time to train model3: {} minutes".format((t2-t1)/60))
-    #with open(datestr+'m_2_subdict.pkl','wb') as f:
-#        pickle.dump(sub_dict,f)
-#    print("trying to pickle models")
-#    model3.save(datestr+'m_2_model.HDF5')
-#    with open(datestr+'m_2_index.pkl','wb') as f:
-#        pickle.dump(word_index,f)
-
 
     modelcurrent = create_modelcurrent(word_index = word_index,
                           embedding_dict= embedding_dict,
@@ -365,9 +299,11 @@ if __name__ =='__main__':
     #fitting model
 
     modelcurrent.fit(X_train,y_train,batch_size=5000,epochs = 3,validation_data=(X_val,y_val),class_weight = class_weights)
-    with open(datestr+'m_3_subdict.pkl','wb') as f:
+
+    print("trying to pickle model")
+    model2.save(datestr+'model.HDF5')
+
+    with open(datestr+'subdict.pkl','wb') as f:
         pickle.dump(sub_dict,f)
-    print("trying to pickle models")
-    model2.save(datestr+'m_3_model.HDF5')
-    with open(datestr+'m_3_index.pkl','wb') as f:
-        pickle.dump(word_index,f)
+    with open(datestr+'index.pkl','wb') as f:
+            pickle.dump(word_index,f)
