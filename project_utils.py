@@ -7,6 +7,12 @@ import re
 import gensim
 import time
 
+from keras.preprocessing.text import Tokenizer
+from keras.preprocessing.sequence import pad_sequences
+from keras.utils import to_categorical
+from keras.layers import Embedding
+
+
 ##This is a bunch of helper functions for the Reddit2vec project
 DBNAME = "reddit_capstone425"
 
@@ -166,7 +172,7 @@ def create_x_y(sublist):
     X = []
     y = []
     for sub in sublist:
-        data = utils.get_sub_raw(sub)
+        data = get_sub_raw(sub)
         for point in data:
             X.append(point)
             y.append(ind)
@@ -238,7 +244,7 @@ def create_embedding_dict(sublist,size,epochs,use_GloVe = False):
     if use_GloVe it returns the 300 length GloVe embeddings
     '''
     if use_GloVe:
-        embedding_dict = utils.process_embeddings('embeddings/glove.6B.300d.txt')
+        embedding_dict = process_embeddings('embeddings/glove.6B.300d.txt')
         return embedding_dict
     w2vmodel = train_word2vec.train_word2vec(sub_list,size = 100, epochs = 15)
     embedding_dict = {}
