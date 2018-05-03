@@ -7,7 +7,8 @@ import re
 import gensim
 import time
 
-from keras.preprocessing.text import Tokenizer
+from keras.preprocessing.sequence import pad_sequences
+from keras.utils import to_categorical
 from keras.layers import Embedding
 
 ##This is a bunch of helper functions for the Reddit2vec project
