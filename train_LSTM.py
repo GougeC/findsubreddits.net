@@ -51,7 +51,7 @@ if __name__ == '__main__':
 
     model = Sequential()
     model.add(embedding_layer)
-    model.add(LSTM(1000, return_sequences=False, activation='softmax'))
+    model.add(LSTM(1000, return_sequences=False, activation='relu'))
     model.add(Dense(len(sub_list), activation='softmax'))
     model.compile(loss='categorical_crossentropy', optimizer = 'rmsprop', metrics = ['acc'])
     model.fit(X_train, y_train, epochs = 20,  class_weight=class_weights,batch_size= 1000,validation_data=(X_val,y_val))
