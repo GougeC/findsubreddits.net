@@ -7,11 +7,9 @@ import re
 import gensim
 import time
 
-from keras.preprocessing.text import Tokenizer
 from keras.preprocessing.sequence import pad_sequences
 from keras.utils import to_categorical
 from keras.layers import Embedding
-
 
 ##This is a bunch of helper functions for the Reddit2vec project
 DBNAME = "reddit_capstone425"
@@ -251,3 +249,28 @@ def create_embedding_dict(sublist,size,epochs,use_GloVe = False):
     for word in w2vmodel.wv.vocab:
         embedding_dict[word] = w2vmodel.wv.word_vec(word)
     return embedding_dict
+
+def create_confusion_matrix(y_true,predictions,sub_mapping):
+    '''
+    returns a pandas matrix of the confusion matrix for the parameters given
+    '''
+    prediction_classes = np.argmax(predictions,axis = 1)
+    true_classes = np.argmax(y_true,axis = 1)
+    num_classes = len(y_true[0])
+    con_matrix = np.zeros((num_classes,num_classes))
+    for i in range(num_classes):
+        for j in range(num_classes):
+            val = np.sum((prediction_classes == i) & (true_classes ==j))
+            con_matrix[i,j] = val
+    index = [sub_mapping[x] for x in range(num_classes)]
+    con_table = pd.DataFrame(con_matrix,index = index,columns = index)
+    row_summations = con_table.T.sum()
+    print("columns are actual, rows are predicted")
+    con_table['totals'] = row_summations
+    col_sums = con_table.sum()
+    con_table =con_table.T
+    con_table['totals'] = col_sums
+    #print("f1 score, macro: ",f1_score(true_classes,prediction_classes,average = 'macro'))
+    #print("f1 score, weighted: ",f1_score(true_classes,prediction_classes,average='weighted'))
+    #print("f1 score, micro: ",f1_score(true_classes,prediction_classes,average = 'micro'))
+    return con_table.T

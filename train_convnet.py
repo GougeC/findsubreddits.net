@@ -5,7 +5,7 @@ import pickle
 import time
 
 from keras.layers import Embedding, Conv1D, MaxPooling1D ,Flatten, Dense, GlobalMaxPooling1D, Dropout, merge
-from keras.preprocessing.text import Tokenizer
+from keras.preprocessing.text import Tokenizer, pad_sequences
 from keras.models import Model
 from keras import Input
 
