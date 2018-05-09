@@ -6,7 +6,7 @@ from collections import Counter
 
 import keras
 import simple_but_tough as sbt
-import w2vutils as wvu
+import project_utils as wvu
 import pickle
 
 import requests
@@ -22,15 +22,17 @@ from keras.utils import to_categorical
 
 ## This class
 class CNN_reddit_recommender():
-    def __init__(self,model_path,sub_map_path,word_ind_path):
+    def __init__(self,model_path = '',sub_map_path = '',word_ind_path = ''):
         """
-        creates the model from a model file, a sub_maping and a word_index
+        creates the model from a model file, a sub_maping and a word_index if paths are not provided it simply does nothing and you can set it yourself
         """
-        self.cnn = keras.models.load_model(model_path)
-
-        self.sub_mapping = pickle.load(open(sub_map_path,'rb'))
-
-        self.word_index = pickle.load(open(word_ind_path,'rb'))
+        self.cnn = None
+        self.sub_mapping = None
+        self.word_index =  None
+        if model_path and sub_map_path and word_ind_path:
+            self.cnn = keras.models.load_model(model_path)
+            self.sub_mapping = pickle.load(open(sub_map_path,'rb'))
+            self.word_index = pickle.load(open(word_ind_path,'rb'))
 
     def predict_on_text(self,text,num_pred=5,as_link = True):
         '''
