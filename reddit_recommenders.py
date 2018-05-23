@@ -6,7 +6,7 @@ from collections import Counter
 
 import keras
 import simple_but_tough as sbt
-import w2vutils as wvu
+import project_utils as wvu
 import pickle
 
 import requests
