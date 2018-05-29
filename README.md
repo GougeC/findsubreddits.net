@@ -9,7 +9,7 @@ The recommender system built in this project has been implemented at www.findsub
 
 
 ## Methods:
-I began by getting data from the 100 top posts(or as many as there were) of around 600 popular subreddits. This data came in the form of titles, text from within text posts and comments. After pulling data from the reddit API I had around 3 million reddit commnents, titles and posts from which to draw text data from.
+I began by getting data from the 100 top posts(or as many as there were) of around 1000 popular subreddits. This data came in the form of titles, text from within text posts and comments. After pulling data from the reddit API I had around 4.5 million reddit commnents, titles and posts from which to draw text data from.
 
 Initially I explored the concept of mapping each comment to a vector using the method described in [A Simple But Tough-To-Beat Baseline For Sentence Embeddings](https://openreview.net/pdf?id=SyK00v5xx) by treating each entire comment as a sentence. Using this technique I built a recommender that took some text and found the subreddits with the most similar average sentence vectors, and recommended them (the SBT_Recommender). However this recommender was very slow to make predictions and had a lot of variance in the quality of the predictions depending on what kind of text was submitted. This did yield some interesting insights into how related various subreddits were when I did K-Means clustering on each subreddits sentence vector, so I knew the data I had could be used to differentiate subreddits based on topic.
 
@@ -20,15 +20,12 @@ In order to train a classifier I first featurized the text using word2vec embedd
 After mapping each word to an embedding vector I used these to train a convolutional neural network (loosely based on the structure in [this](https://blog.keras.io/using-pre-trained-word-embeddings-in-a-keras-model.html) article) to classify comments/titles into the proper subreddit. Using this classifier I can take some content that a user presumably likes and find which subreddits it would likely be found in. Using this I can make recommendations on which subs are similar to their interests.
 
 ### Current Model:
-![](images/modeldiagram.png)
+![](images/CNN diagram.png)
 
-The current model for the recommender is a convolutional neural network with one convolutional layer of 128 size 5 filters followed by max pooling and one fully connected layer of 1024 nodes before the softmax output layer. This model will likely need to be adapted as I scale the system up to a greater number of subreddits.
+The current model for the recommender is a convolutional neural network with two convolutional layers of 200 size 5 filters followed by max pooling and 3 fully connected layers of 500 nodes before the softmax output layer. This model was selected after I pulled data for more subreddits in May 2018 and is deeper and has more nodes and filters than my original model. Additionally the subreddits are weighted by 1 + log10(M / x) where M is the number of data points in the most popular subreddit and x is the number of data points in the subreddit being weighted. This was so that the model would recommend subreddits other than the most popular ones, making recommendations more interesting.
 
 ### Future Work:
-* Improve web interface and clean up the css
-* Collect data on more subreddits and expand the pool for recommendations
-* Experiment with neural net structure
-
+* Set up a script to automatically pull data, train a new model and update the site periodically 
 
 #### Libraries  and Technologies Used
 * Tweepy
