@@ -1,68 +1,69 @@
-<!--A Design by W3layouts
-Author: W3layout
-Author URL: http://w3layouts.com
-License: Creative Commons Attribution 3.0 Unported
-License URL: http://creativecommons.org/licenses/by/3.0/
--->
 <!DOCTYPE html>
 <html lang="en">
-<head>
-<title>Subreddit Recommender</title>
 
-<!-- Meta tag Keywords -->
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
-<meta name="keywords" content="Shopping Sign in Form template Responsive, Login form web template,Flat Pricing tables,Flat Drop downs Sign up Web Templates,
- Flat Web Templates, Login sign up Responsive web template, SmartPhone Compatible web template, free web designs for Nokia, Samsung, LG, SonyEricsson, Motorola web design">
- <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
+  <head>
+
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
+    <meta name="description" content="">
+    <meta name="author" content="">
+
+    <title>Find Subreddits</title>
+
+    <!-- Bootstrap core CSS -->
+    <link href="../static/vendor/bootstrap/css/bootstrap.min.css" rel="stylesheet">
+
+    <!-- Custom styles for this template -->
+    <link href="../static/css/2-col-portfolio.css" rel="stylesheet">
+    <script src="http://code.jquery.com/jquery-1.11.1.min.js"></script>
 
 <script type="application/x-javascript"> addEventListener("load", function() { setTimeout(hideURLbar, 0); }, false);
 
 function hideURLbar(){ window.scrollTo(0,1); } </script>
 <!-- Meta tag Keywords -->
 <script type="text/javascript">
-   function make_Text_Recs() {
-       text = getText()
-       $.ajax({
-           url: "/text",
-           contentType: "application/json",
-           type: "POST",
-           success: showRecs,
-           data: JSON.stringify({'text':text,'handles':[]})
-       });
-   }
-   function make_Twitter_Recs() {
-       twitters = getTwitters()
-       $.ajax({
-           url: "/twitter",
-           contentType: "application/json",
-           type: "POST",
-           success: showRecs,
-           data: JSON.stringify({'handles':twitters,'text':[]})
-       });
-   }
+  function make_Text_Recs() {
+      text = getText()
+      $.ajax({
+          url: "/text",
+          contentType: "application/json",
+          type: "POST",
+          success: showRecs,
+          data: JSON.stringify({'text':text,'handles':[]})
+      });
+  }
+  function make_Twitter_Recs() {
+      twitters = getTwitters()
+      $.ajax({
+          url: "/twitter",
+          contentType: "application/json",
+          type: "POST",
+          success: showRecs,
+          data: JSON.stringify({'handles':twitters,'text':[]})
+      });
+  }
 
-    function getTwitters(){
-            return $("#twitterBox").val()
-       }
-    function getText(){
-            return $("#textBox").val()
-           }
+   function getTwitters(){
+           return $("#twitterBox").val()
+      }
+   function getText(){
+           return $("#textBox").val()
+          }
 
-   function showRecs(rec_ids) {
-       recs_html="<div>"
-       rec_ids.forEach(function(sub) {
-            recs_html += '<a href="https://www.reddit.com/'
-            recs_html += sub
-            recs_html += '">'
-            recs_html += sub
-            recs_html += '</a>'
-            recs_html += '<br>'
-       })
-       recs_html += "</div>"
-       recsDiv = $("div#subreddits")
-       recsDiv.html(recs_html)
-   }
+  function showRecs(rec_ids) {
+      recs_html="<div>"
+      rec_ids.forEach(function(sub) {
+           recs_html += '<a href="https://www.reddit.com/'
+           recs_html += sub
+           recs_html += '">'
+           recs_html += sub
+           recs_html += '</a>'
+           recs_html += '<br>'
+      })
+      recs_html += "</div>"
+      recsDiv = $("div#subreddits")
+      recsDiv.html(recs_html)
+  }
 </script>
 <!-- css files -->
 <link href="../static/css/style.css" rel="stylesheet" type="text/css" media="all" />
@@ -74,46 +75,101 @@ function hideURLbar(){ window.scrollTo(0,1); } </script>
 <link href="//fonts.googleapis.com/css?family=Varela+Round&amp;subset=hebrew,latin-ext,vietnamese" rel="stylesheet">
 <!-- //Online-fonts -->
 
-</head>
-<body>
-	<!-- main -->
-    <div class = "bigbox">
-	<div class="main">
-		<div class="main-w3l">
-			<h1 class="logo-w3">Subreddit Recommender</h1>
-			<div class="w3layouts-left">
-				<h2>Find content similar to Twitter accounts:</h2>
-				<!--<div class="icon">
-					<span class="fa fa-thumbs-o-up" aria-hidden="true"></span>
-				</div>-->
-                    <textarea id="twitterBox" placeholder="Paste some text here to find subreddits that are similar"
-                    rows="10" cols="35"></textarea>
-                    <br>
-                    <button id="submit-button" onclick="make_Twitter_Recs()"> Make Recommendations </button>
-                    <p> Enter handles as a comma seperated list</p>
-			</div>
-			<div class="w3layouts-main">
-				<h2>Find content similar to some text:</h2>
-                        <textarea id="textBox" placeholder="Paste some text here to find subreddits that are similar"
-                        rows="10" cols="35"></textarea>
-                        <br>
-                        <button id="submit-button2" onclick="make_Text_Recs()"> Make Recommendations </button>
-                        <p>Copy paste an article or block of text here to find subreddits in which you could find similar content</p>
-                        <p>For best results seperate paragraphs by lines and enter only english text</p>
-			</div>
-			<div class="clear"></div>
-			<!-- //main -->
-            <div class="subreddits" id="subreddits">
 
-			</div>
+  </head>
 
-			<!--footer-->
-			<div class="footer-w3l">
-				<p>&copy;  Connor Gouge | <a href="https://github.com/GougeC/dsi_capstone">Github</a> | Design by W3layouts</p>
-			</div>
-			<!--//footer-->
-		</div>
-	</div>
+  <body>
+
+    <!-- Navigation -->
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark fixed-top">
+      <div class="container">
+        <a class="navbar-brand" href="#">findsubreddits.net</a>
+        <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarResponsive" aria-controls="navbarResponsive" aria-expanded="false" aria-label="Toggle navigation">
+          <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarResponsive">
+          <ul class="navbar-nav ml-auto">
+            <li class="nav-item active">
+              <!-- <a class="nav-link" href="#">Home
+                <span class="sr-only">(current)</span>
+              </a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">About</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Services</a>
+            </li>
+            <li class="nav-item">
+              <a class="nav-link" href="#">Contact</a> -->
+            </li>
+          </ul>
+        </div>
+      </div>
+    </nav>
+
+    <!-- Page Content -->
+    <div class="container">
+
+      <!-- Page Heading -->
+      <h1 class="my-4" style="text-align: center">Content Based Subreddit Recommendation
+          <br>
+        <small></small>
+      </h1>
+       <br>
+      findsubreddits.net is a deep learning based content recommender for reddit.com. When you input text or pull text from a set of twitter accounts, a convolutional neural net will classify the text you have put in and recommened a set of subreddits that contain similar topics. If you want to learn more about how it works you can check out the <a href="https://github.com/GougeC/findsubreddits.net">Github repo</a> for this project.
+        <br>
+        <br>
+      <div class="row">
+        <div class="col-lg-6 portfolio-item">
+          <div class="card h-100">
+            <div class="card-body">
+              <h4 class="card-title">
+                Find Subreddits Based on Twitter
+              </h4>
+              <textarea id="twitterBox" placeholder="Enter comma seperated twitter handles here to find subreddits with similar topics" rows="10" cols="35"></textarea>
+                <br>
+                <button id="submit-button" onclick="make_Twitter_Recs()"> Make Recommendations </button>
+                <br>
+              <p class="card-text">Find Subreddits based on a set of twitter accounts. The last 25 tweets from each account will be scraped to generate one set of recommendations Based on the combined text.</p>
+            </div>
+          </div>
+        </div>
+        <div class="col-lg-6 portfolio-item">
+          <div class="card h-100">
+            <div class="card-body">
+              <h4 class="card-title">
+                Find Subreddits Based on an Article
+              </h4>
+              <textarea id="textBox" placeholder="Paste some text here to find subreddits that are similar" rows="10" cols="35"></textarea>
+                <br>
+                <button id="submit-button2" onclick="make_Text_Recs()"> Make Recommendations </button>
+                <br>
+              <p class="card-text">Copy paste an article or block of text here to find subreddits in which you could find similar content. For best results seperate paragraphs by lines and enter only english text. </p>
+            </div>
+          </div>
+        </div>
+      <!-- /.row -->
+      <div class="subreddits" id="subreddits">
+
+      </div>
+
+
     </div>
-</body>
+    <!-- /.container -->
+
+    <!-- Footer -->
+    <footer class="py-5 bg-dark">
+      <div class="container">
+        <p class="m-0 text-center text-white">&copy;  Connor Gouge | <a href="https://github.com/GougeC/">Github</a> | <a href="https://www.linkedin.com/in/connorgouge/">LinkedIn</a></p>
+      </div>
+      <!-- /.container -->
+    </footer>
+
+    <!-- Bootstrap core JavaScript -->
+    <script src="../static/vendor/jquery/jquery.min.js"></script>
+    <script src="../static/vendor/bootstrap/js/bootstrap.bundle.min.js"></script>
+
+  </body>
+
 </html>
