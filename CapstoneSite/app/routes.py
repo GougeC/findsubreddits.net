@@ -5,10 +5,10 @@ from flask import render_template,request, flash, redirect,url_for,jsonify
 from app import app
 import reddit_recommenders as rrec
 
-#modelpath = '../data/1Convbigdense.HDF5'
-#smpath = '../data/1Convbigdensedict.pkl'
-#wipath = '../data/1Convbigdenseindex1.pkl'
-#conv1 = rrec.CNN_reddit_recommender(modelpath,smpath,wipath)
+modelpath = '../data/may29model.HDFS'
+smpath = '../data/may29dict.pkl'
+wipath = '../data/may29wordindex.pkl'
+conv1 = rrec.CNN_reddit_recommender(modelpath,smpath,wipath)
 
 
 @app.route('/')
