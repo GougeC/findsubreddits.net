@@ -20,7 +20,7 @@ In order to train a classifier I first featurized the text using word2vec embedd
 After mapping each word to an embedding vector I used these to train a convolutional neural network (loosely based on the structure in [this](https://blog.keras.io/using-pre-trained-word-embeddings-in-a-keras-model.html) article) to classify comments/titles into the proper subreddit. Using this classifier I can take some content that a user presumably likes and find which subreddits it would likely be found in. Using this I can make recommendations on which subs are similar to their interests.
 
 ### Current Model:
-![](images/CNN diagram.png)
+![](images/CNNdiagram.png)
 
 The current model for the recommender is a convolutional neural network with two convolutional layers of 200 size 5 filters followed by max pooling and 3 fully connected layers of 500 nodes before the softmax output layer. This model was selected after I pulled data for more subreddits in May 2018 and is deeper and has more nodes and filters than my original model. Additionally the subreddits are weighted by 1 + log10(M / x) where M is the number of data points in the most popular subreddit and x is the number of data points in the subreddit being weighted. This was so that the model would recommend subreddits other than the most popular ones, making recommendations more interesting.
 
