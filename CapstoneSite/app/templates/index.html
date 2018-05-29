@@ -52,6 +52,7 @@ function hideURLbar(){ window.scrollTo(0,1); } </script>
 
   function showRecs(rec_ids) {
       recs_html="<div>"
+      recs_html+='Recommended subreddits: <br>'
       rec_ids.forEach(function(sub) {
            recs_html += '<a href="https://www.reddit.com/'
            recs_html += sub
@@ -150,14 +151,15 @@ function hideURLbar(){ window.scrollTo(0,1); } </script>
           </div>
         </div>
       <!-- /.row -->
-      <div class="subreddits" id="subreddits">
+      <div class="subreddits" id="subreddits" style="text-align: center; margin: 0 auto;">
 
       </div>
 
 
     </div>
     <!-- /.container -->
-
+    <br>
+    <br>
     <!-- Footer -->
     <footer class="py-5 bg-dark">
       <div class="container">
