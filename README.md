@@ -1,4 +1,4 @@
-# Reddit2Vec: Subreddit Recommendation
+# findsubreddits.net: Subreddit Recommendation
 
 ## Capstone project for the Galvanize Data Science Immersive program
 
