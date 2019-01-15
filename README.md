@@ -5,9 +5,6 @@
 ## Project Goals:
 The goal of this project is to give recommendations on reddit content (in the form of subreddits to follow) based on the kind of content a user already enjoys. In this project that will take the form of a web page where a user will input their Twitter handle and receive recommendations for subreddits to follow based on that data. Additionally a user will be able to provide the text of some content they enjoy and find which subreddits it best belongs in. While the scope of this project is limited to reddit I feel that the approach I have taken here could be extended to any text based content aggregator or social network.
 
-The recommender system built in this project has been implemented at www.findsubreddits.net
-
-
 ## Methods:
 I began by getting data from the 100 top posts(or as many as there were) of around 1000 popular subreddits. This data came in the form of titles, text from within text posts and comments. After pulling data from the reddit API I had around 4.5 million reddit commnents, titles and posts from which to draw text data from.
 
